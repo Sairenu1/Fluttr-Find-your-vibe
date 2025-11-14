@@ -1,0 +1,208 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
+
+* { 
+  margin: 0; 
+  padding: 0; 
+  box-sizing: border-box; 
+}
+
+body {
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  background: #000000;
+  color: #ffffff;
+  min-height: 100vh;
+  overflow-x: hidden;
+  width:100%;
+  display: flex;
+  justify-content: center;  
+  align-items: center;  
+}
+
+.app { 
+  min-height: 100vh; 
+  position: relative;
+}
+
+/* Glass Effect */
+.glass-effect {
+  background: rgba(255, 255, 255, 0.05); /* Slight transparency */
+  -webkit-backdrop-filter: blur(20px); /* Safari support */
+  backdrop-filter: blur(20px); /* Modern browsers */
+  border-radius: 16px;
+  border: 1px solid rgba(255, 0, 110, 0.1);
+}
+
+/* Optional fallback for unsupported browsers */
+@supports not ((-webkit-backdrop-filter: none) or (backdrop-filter: none)) {
+  .glass-effect {
+    background: rgba(255, 255, 255, 0.2);
+  }
+}
+
+/* Navigation Bar */
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  padding: 12px 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: 1000;
+}
+
+.nav-logo {
+  font-size: 24px;
+  font-weight: 800;
+  background: linear-gradient(135deg, #ff006e, #ff4458, #ff006e);
+  background-size: 200% 200%;
+  animation: gradient-shift 3s ease infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Login Page */
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  background: #000000;
+}
+
+.login-bg {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at center, rgba(255, 0, 110, 0.1) 0%, transparent 70%);
+}
+
+.falling-hearts-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  z-index: 1;
+}
+
+.falling-heart {
+  position: absolute;
+  color: #ff006e;
+  text-shadow: 0 0 10px rgba(255, 0, 110, 0.8);
+  animation: fall linear infinite;
+  opacity: 0;
+}
+
+@keyframes fall {
+  0% {
+    transform: translateY(-100vh) rotate(0deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 0.8;
+  }
+  90% {
+    opacity: 0.8;
+  }
+  100% {
+    transform: translateY(100vh) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+.login-card {
+  padding: 50px 40px;
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  z-index: 10;
+}
+
+.login-card.glass-effect {
+  box-shadow: 
+    0 20px 60px rgba(255, 0, 110, 0.3),
+    0 0 100px rgba(255, 0, 110, 0.1),
+    inset 0 0 30px rgba(255, 0, 110, 0.05);
+}
+
+/* Login Logo */
+.login-logo {
+  width: 100px;
+  height: 100px;
+  margin: 0 auto 30px;
+  background: linear-gradient(135deg, #ff006e, #ff4458);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 10px 40px rgba(255, 0, 110, 0.5);
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+@keyframes pulse-glow {
+  0%, 100% { 
+    box-shadow: 0 10px 40px rgba(255, 0, 110, 0.5);
+    transform: scale(1);
+  }
+  50% { 
+    box-shadow: 0 20px 60px rgba(255, 0, 110, 0.8);
+    transform: scale(1.05);
+  }
+}
+
+/* Input fields */
+.input {
+  width: 100%;
+  padding: 16px 16px 16px 50px;
+  border-radius: 16px;
+  font-size: 15px;
+  color: white;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 0, 110, 0.2);
+  transition: all 0.3s;
+  font-family: 'Inter', sans-serif;
+}
+
+.input:focus {
+  outline: none;
+  border-color: #ff006e;
+  box-shadow: 0 0 20px rgba(255, 0, 110, 0.3);
+}
+
+/* Buttons */
+.btn-primary {
+  width: 100%;
+  padding: 16px;
+  background: linear-gradient(135deg, #ff006e, #ff4458);
+  border: none;
+  border-radius: 16px;
+  color: white;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 10px 30px rgba(255, 0, 110, 0.4);
+  margin-top: 20px;
+  transition: all 0.3s;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 40px rgba(255, 0, 110, 0.6);
+}
+
+/* All sections that used backdrop-filter now use .glass-effect */
+.login-card, .profile-card, .stat-card, .profile-btn, .settings-section, .standout-card {
+  composes: glass-effect;
+}

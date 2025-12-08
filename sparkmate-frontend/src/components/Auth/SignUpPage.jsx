@@ -26,10 +26,10 @@ const FallingHearts = () => {
             top: '-50px'
           }}
         >
-          <Heart 
-            size={heart.size} 
-            fill="rgba(255, 105, 180, 0.6)" 
-            color="rgba(255, 105, 180, 0.8)" 
+          <Heart
+            size={heart.size}
+            fill="rgba(255, 105, 180, 0.6)"
+            color="rgba(255, 105, 180, 0.8)"
           />
         </div>
       ))}
@@ -140,15 +140,15 @@ const SignUpPage = () => {
   return (
     <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
       {/* Animated Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-500 animate-gradient-shift">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(255,255,255,0.1),transparent)]"></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-purple-900 to-violet-900 animate-gradient-shift">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(0,0,0,0.2),transparent)]"></div>
       </div>
-      
+
       <FallingHearts />
-      
+
       {/* Signup Card */}
       <div className="relative z-10 w-full max-w-md">
-        <div className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 md:p-10 transform transition-all duration-500 hover:shadow-pink-500/30">
+        <div className="bg-gray-900/80 backdrop-blur-xl rounded-3xl shadow-2xl p-8 md:p-10 border border-white/10 transform transition-all duration-500 hover:shadow-purple-500/20">
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <div className="relative">
@@ -160,10 +160,10 @@ const SignUpPage = () => {
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold text-center mb-2 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-            Join SparkMate
+          <h1 className="text-4xl md:text-5xl font-bold text-center mb-2 bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text text-transparent">
+            Join Fluttr
           </h1>
-          <p className="text-center text-gray-600 mb-8 text-sm md:text-base">
+          <p className="text-center text-gray-400 mb-8 text-sm md:text-base">
             Start your love story today ✨
           </p>
 
@@ -172,7 +172,7 @@ const SignUpPage = () => {
             {/* Name Input */}
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-              <div className="relative flex items-center bg-gray-50 rounded-xl border-2 border-gray-200 focus-within:border-pink-500 focus-within:bg-white transition-all duration-300">
+              <div className="relative flex items-center bg-gray-800/50 rounded-xl border border-gray-700/50 focus-within:border-pink-500 focus-within:bg-gray-800 transition-all duration-300">
                 <User className="absolute left-4 text-gray-400 group-focus-within:text-pink-500 transition-colors" size={20} />
                 <input
                   type="text"
@@ -182,7 +182,7 @@ const SignUpPage = () => {
                   onChange={handleChange}
                   required
                   disabled={loading}
-                  className="w-full pl-12 pr-4 py-3.5 bg-transparent outline-none text-gray-700 placeholder-gray-400 disabled:opacity-50"
+                  className="w-full pl-12 pr-4 py-3.5 bg-transparent outline-none text-gray-200 placeholder-gray-500 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -190,7 +190,7 @@ const SignUpPage = () => {
             {/* Email Input */}
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-              <div className="relative flex items-center bg-gray-50 rounded-xl border-2 border-gray-200 focus-within:border-pink-500 focus-within:bg-white transition-all duration-300">
+              <div className="relative flex items-center bg-gray-800/50 rounded-xl border border-gray-700/50 focus-within:border-pink-500 focus-within:bg-gray-800 transition-all duration-300">
                 <Mail className="absolute left-4 text-gray-400 group-focus-within:text-pink-500 transition-colors" size={20} />
                 <input
                   type="email"
@@ -200,7 +200,7 @@ const SignUpPage = () => {
                   onChange={handleChange}
                   required
                   disabled={loading}
-                  className="w-full pl-12 pr-4 py-3.5 bg-transparent outline-none text-gray-700 placeholder-gray-400 disabled:opacity-50"
+                  className="w-full pl-12 pr-4 py-3.5 bg-transparent outline-none text-gray-200 placeholder-gray-500 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -208,7 +208,7 @@ const SignUpPage = () => {
             {/* Password Input */}
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-              <div className="relative flex items-center bg-gray-50 rounded-xl border-2 border-gray-200 focus-within:border-pink-500 focus-within:bg-white transition-all duration-300">
+              <div className="relative flex items-center bg-gray-800/50 rounded-xl border border-gray-700/50 focus-within:border-pink-500 focus-within:bg-gray-800 transition-all duration-300">
                 <Lock className="absolute left-4 text-gray-400 group-focus-within:text-pink-500 transition-colors" size={20} />
                 <input
                   type="password"
@@ -218,7 +218,7 @@ const SignUpPage = () => {
                   onChange={handleChange}
                   required
                   disabled={loading}
-                  className="w-full pl-12 pr-4 py-3.5 bg-transparent outline-none text-gray-700 placeholder-gray-400 disabled:opacity-50"
+                  className="w-full pl-12 pr-4 py-3.5 bg-transparent outline-none text-gray-200 placeholder-gray-500 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -226,7 +226,7 @@ const SignUpPage = () => {
             {/* Confirm Password Input */}
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-              <div className="relative flex items-center bg-gray-50 rounded-xl border-2 border-gray-200 focus-within:border-pink-500 focus-within:bg-white transition-all duration-300">
+              <div className="relative flex items-center bg-gray-800/50 rounded-xl border border-gray-700/50 focus-within:border-pink-500 focus-within:bg-gray-800 transition-all duration-300">
                 <Lock className="absolute left-4 text-gray-400 group-focus-within:text-pink-500 transition-colors" size={20} />
                 <input
                   type="password"
@@ -236,7 +236,7 @@ const SignUpPage = () => {
                   onChange={handleChange}
                   required
                   disabled={loading}
-                  className="w-full pl-12 pr-4 py-3.5 bg-transparent outline-none text-gray-700 placeholder-gray-400 disabled:opacity-50"
+                  className="w-full pl-12 pr-4 py-3.5 bg-transparent outline-none text-gray-200 placeholder-gray-500 disabled:opacity-50"
                 />
               </div>
             </div>
@@ -245,7 +245,7 @@ const SignUpPage = () => {
             <button
               onClick={handleSubmit}
               disabled={loading}
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-pink-500/50 transform hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none relative overflow-hidden group mt-6"
+              className="w-full bg-gradient-to-r from-pink-600 to-purple-600 text-white font-semibold py-4 rounded-xl shadow-lg hover:shadow-pink-500/30 transform hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none relative overflow-hidden group mt-6"
             >
               <span className="relative z-10">
                 {loading ? (
@@ -266,17 +266,17 @@ const SignUpPage = () => {
 
           {/* Divider */}
           <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-            <span className="px-4 text-gray-400 text-sm font-medium">or</span>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
+            <span className="px-4 text-gray-500 text-sm font-medium">or</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-700 to-transparent"></div>
           </div>
 
           {/* Login Link */}
-          <div className="text-center text-gray-600 text-sm md:text-base">
+          <div className="text-center text-gray-400 text-sm md:text-base">
             Already have an account?{' '}
-            <button 
+            <button
               onClick={() => navigate('/login')}
-              className="text-pink-600 font-semibold hover:text-purple-600 transition-colors duration-300 hover:underline"
+              className="text-pink-400 font-semibold hover:text-purple-400 transition-colors duration-300 hover:underline"
             >
               Sign in
             </button>
@@ -284,7 +284,7 @@ const SignUpPage = () => {
         </div>
 
         {/* Bottom Decorative Elements */}
-        <div className="mt-8 text-center text-white/80 text-xs md:text-sm">
+        <div className="mt-8 text-center text-white/50 text-xs md:text-sm">
           <p>💕 Where hearts connect and love begins 💕</p>
         </div>
       </div>

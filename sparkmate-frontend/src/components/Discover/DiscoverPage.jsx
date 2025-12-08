@@ -1,12 +1,20 @@
 import { useState, useEffect } from 'react';
-import { 
-  Heart, X, Star, MessageCircle, User, Sparkles, MapPin, 
+import { useNavigate } from 'react-router-dom';
+import { useAuth } from '../../context/AuthContext';
+import {
+  Heart, X, Star, MessageCircle, User, Sparkles, MapPin,
   Plane, Dumbbell, Camera, Music, Book, Palette, Dog, Pizza,
   Info, Shield, Zap, Settings, Coffee, Check, Bell, Filter,
-  ArrowLeft, ChevronRight
+  ArrowLeft, ChevronRight, ChevronDown, LogOut
 } from 'lucide-react';
 
+import { motion, AnimatePresence } from 'framer-motion';
+import Toggle from '../UI/Toggle';
+import useGeolocation from '../../hooks/useGeolocation';
+
 const DiscoverPage = () => {
+  const { logout } = useAuth();
+  const navigate = useNavigate();
   const [currentIndex, setCurrentIndex] = useState(0);
   const [activeTab, setActiveTab] = useState('discover');
   const [likedUsers, setLikedUsers] = useState([]);
@@ -21,6 +29,36 @@ const DiscoverPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showProfileDetails, setShowProfileDetails] = useState(false);
   const [notifications, setNotifications] = useState(2);
+  const [settings, setSettings] = useState({
+    notifications: true,
+    showDistance: false,
+    showAge: true
+  });
+
+  const { location, error, getLocation } = useGeolocation();
+
+  const toggleSetting = (key) => {
+    setSettings(prev => {
+      const newSettings = { ...prev, [key]: !prev[key] };
+
+      if (key === 'showDistance' && newSettings.showDistance) {
+        showToast('Requesting location access... 🌍');
+        getLocation();
+      }
+
+      return newSettings;
+    });
+  };
+
+  useEffect(() => {
+    if (location.loaded && location.coordinates.lat) {
+      showToast('Location accessed successfully! ✅');
+      console.log('User Location:', location.coordinates);
+    }
+    if (error) {
+      showToast(`Location error: ${error.message} ❌`);
+    }
+  }, [location, error]);
 
   const users = [
     {
@@ -33,7 +71,6 @@ const DiscoverPage = () => {
       interests: ['Travel', 'Yoga', 'Coffee', 'Photography'],
       tags: ['5\' 7" (170 cm)', 'Active', 'Don\'t smoke', 'Spiritual'],
       images: [
-        'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=800&q=80',
         'https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=800&q=80',
         'https://images.unsplash.com/photo-1502823403499-6ccfcf4fb453?w=800&q=80'
       ],
@@ -109,6 +146,91 @@ const DiscoverPage = () => {
       verified: false,
       job: 'Content Creator',
       education: 'Boston University'
+    },
+    {
+      id: 6,
+      name: 'Liam',
+      age: 28,
+      location: 'Brooklyn',
+      distance: '3 miles away',
+      bio: 'Architect building dreams 🏙️ Coffee snob ☕ minimalist design enthusiast. Let\'s explore the city\'s hidden gems.',
+      interests: ['Architecture', 'Coffee', 'Design', 'Travel'],
+      tags: ['6\' 0" (183 cm)', 'Liberal', 'Social drinker', 'Aquarius'],
+      images: [
+        'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=800&q=80',
+        'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=800&q=80'
+      ],
+      verified: true,
+      job: 'Architect',
+      education: 'Pratt Institute'
+    },
+    {
+      id: 7,
+      name: 'James',
+      age: 25,
+      location: 'East Village',
+      distance: '2 miles away',
+      bio: 'Musician & Vinyl collector 🎸 seeking a concert buddy. I make the best playlists, guaranteed.',
+      interests: ['Music', 'Concerts', 'Vinyl', 'Photography'],
+      tags: ['5\' 11" (180 cm)', 'Moderate', 'Smoker', 'Gemini'],
+      images: [
+        'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=800&q=80',
+        'https://images.unsplash.com/photo-1463453091185-61582044d556?w=800&q=80'
+      ],
+      verified: false,
+      job: 'Musician',
+      education: 'Berklee Online'
+    },
+    {
+      id: 8,
+      name: 'Noah',
+      age: 29,
+      location: 'Soho',
+      distance: '1 mile away',
+      bio: 'Tech Founder 🚀 Fitness junkie 💪 Always chasing the next big idea. Work hard, play hard.',
+      interests: ['Tech', 'Startups', 'Fitness', 'Running'],
+      tags: ['6\' 1" (185 cm)', 'Atheist', 'Social drinker', 'Capricorn'],
+      images: [
+        'https://images.unsplash.com/photo-1492562080023-ab3db95bfbce?w=800&q=80',
+        'https://images.unsplash.com/photo-1480455624313-e29b44bbfde1?w=800&q=80'
+      ],
+      verified: true,
+      job: 'Entrepreneur',
+      education: 'Stanford University'
+    },
+    {
+      id: 9,
+      name: 'Lucas',
+      age: 26,
+      location: 'Chelsea',
+      distance: '2 miles away',
+      bio: 'Sous Chef 👨‍🍳 Food is my love language. I promise to cook you the best dinner of your life.',
+      interests: ['Cooking', 'Wine', 'Travel', 'Foodie'],
+      tags: ['5\' 9" (175 cm)', 'Liberal', 'Don\'t smoke', 'Taurus'],
+      images: [
+        'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=800&q=80',
+        'https://images.unsplash.com/photo-1504257432389-52343af06ae3?w=800&q=80'
+      ],
+      verified: true,
+      job: 'Sous Chef',
+      education: 'Culinary Institute of America'
+    },
+    {
+      id: 10,
+      name: 'Ethan',
+      age: 27,
+      location: 'Williamsburg',
+      distance: '3 miles away',
+      bio: 'Photographer 📸 endlessly curious about the world. Hiking trails and art galleries are my happy places.',
+      interests: ['Photography', 'Art', 'Hiking', 'Nature'],
+      tags: ['6\' 2" (188 cm)', 'Spiritual', 'Social drinker', 'Libra'],
+      images: [
+        'https://images.unsplash.com/photo-1500917293891-ef795e70e1f6?w=800&q=80',
+        'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=800&q=80'
+      ],
+      verified: false,
+      job: 'Photographer',
+      education: 'SVA'
     }
   ];
 
@@ -153,12 +275,12 @@ const DiscoverPage = () => {
     animateSwipe('right', () => {
       setLikedUsers([...likedUsers, currentUser]);
       showToast(`You liked ${currentUser.name}! 💕`);
-      
+
       if (Math.random() < 0.3) {
         setMatches([...matches, currentUser]);
         setTimeout(() => showToast(`It's a match with ${currentUser.name}! 🎉`), 400);
       }
-      
+
       nextProfile();
     });
   };
@@ -175,14 +297,14 @@ const DiscoverPage = () => {
       animateSwipe('up', () => {
         setSuperLikes(superLikes - 1);
         setLikedUsers([...likedUsers, { ...currentUser, superLiked: true }]);
-        
+
         if (Math.random() < 0.6) {
           setMatches([...matches, currentUser]);
           showToast(`It's a SUPER MATCH with ${currentUser.name}! 🌟`);
         } else {
           showToast(`Super Like sent to ${currentUser.name}! 💫`);
         }
-        
+
         nextProfile();
       });
     } else {
@@ -215,7 +337,7 @@ const DiscoverPage = () => {
   useEffect(() => {
     const handleKeyPress = (e) => {
       if (activeTab === 'discover' && !isAnimating && !showSettings && !showFilters) {
-        switch(e.key) {
+        switch (e.key) {
           case 'ArrowLeft':
             handlePass();
             break;
@@ -237,7 +359,7 @@ const DiscoverPage = () => {
 
   const getSwipeTransform = () => {
     if (!swipeDirection) return '';
-    switch(swipeDirection) {
+    switch (swipeDirection) {
       case 'left':
         return 'translateX(-150%) rotate(-15deg)';
       case 'right':
@@ -250,12 +372,12 @@ const DiscoverPage = () => {
   };
 
   const renderContent = () => {
-    switch(activeTab) {
+    switch (activeTab) {
       case 'discover':
         return (
           <div className="flex items-center justify-center min-h-[calc(100vh-180px)] px-4">
             <div className="w-full max-w-md">
-              <div 
+              <div
                 className="relative bg-gray-800 rounded-[28px] overflow-hidden shadow-[0_0_60px_rgba(236,72,153,0.3),0_0_30px_rgba(239,68,68,0.2)]"
                 style={{
                   transform: getSwipeTransform(),
@@ -270,7 +392,7 @@ const DiscoverPage = () => {
                     alt={currentUser.name}
                     className="w-full h-full object-cover"
                   />
-                  
+
                   {/* Progress Bars */}
                   <div className="absolute top-3 left-3 right-3 flex gap-1.5 z-10">
                     {currentUser.images.map((_, idx) => (
@@ -278,10 +400,9 @@ const DiscoverPage = () => {
                         key={idx}
                         className="h-1 flex-1 rounded-full bg-black/30 backdrop-blur-sm overflow-hidden"
                       >
-                        <div 
-                          className={`h-full bg-white transition-all duration-300 ${
-                            idx === imageIndex ? 'w-full' : idx < imageIndex ? 'w-full' : 'w-0'
-                          }`}
+                        <div
+                          className={`h-full bg-white transition-all duration-300 ${idx === imageIndex ? 'w-full' : idx < imageIndex ? 'w-full' : 'w-0'
+                            }`}
                         />
                       </div>
                     ))}
@@ -289,12 +410,12 @@ const DiscoverPage = () => {
 
                   {/* Image Navigation */}
                   <div className="absolute inset-0 flex">
-                    <button 
+                    <button
                       onClick={prevImage}
                       className="flex-1 bg-transparent active:bg-black/10 transition-colors"
                       aria-label="Previous image"
                     />
-                    <button 
+                    <button
                       onClick={nextImage}
                       className="flex-1 bg-transparent active:bg-black/10 transition-colors"
                       aria-label="Next image"
@@ -303,7 +424,7 @@ const DiscoverPage = () => {
 
                   {/* Gradient Overlay */}
                   <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent"></div>
-                  
+
                   {/* User Info Overlay */}
                   <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
                     <div className="flex items-center justify-between mb-3">
@@ -317,16 +438,16 @@ const DiscoverPage = () => {
                           </div>
                         )}
                       </div>
-                      <button 
+                      <button
                         onClick={() => setShowProfileDetails(!showProfileDetails)}
                         className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/30 transition-all"
                       >
                         <Info size={18} className="text-white" />
                       </button>
                     </div>
-                    
+
                     <p className="text-sm font-medium text-white/90 mb-1">{currentUser.job}</p>
-                    
+
                     <button className="flex items-center gap-1.5 text-white/90 text-sm mb-3 hover:text-white transition-colors">
                       <span className="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
                         <Camera size={12} />
@@ -341,7 +462,7 @@ const DiscoverPage = () => {
                   <p className="text-white/90 text-sm leading-relaxed mb-4">
                     {currentUser.bio}
                   </p>
-                  
+
                   {/* Location */}
                   <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-700">
                     <div className="w-10 h-10 bg-gray-700/50 rounded-full flex items-center justify-center">
@@ -352,7 +473,7 @@ const DiscoverPage = () => {
                       <p className="text-white/60 text-xs">{currentUser.distance}</p>
                     </div>
                   </div>
-                  
+
                   {/* Tags */}
                   <div className="flex flex-wrap gap-2 mb-4">
                     {currentUser.tags.map((tag, idx) => (
@@ -382,7 +503,7 @@ const DiscoverPage = () => {
                   </div>
                 </div>
               </div>
-              
+
               {/* Action Buttons */}
               <div className="flex justify-center items-center gap-5 mt-6">
                 <button
@@ -481,8 +602,11 @@ const DiscoverPage = () => {
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70"></div>
                         <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
                           <p className="font-bold text-lg mb-3">{user.name}, {user.age}</p>
-                          <button 
-                            onClick={() => showToast(`Opening chat with ${user.name}...`)}
+                          <button
+                            onClick={() => {
+                              showToast(`Opening chat with ${user.name}...`);
+                              navigate(`/chat/${user.id}`);
+                            }}
                             className="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-semibold py-2.5 rounded-full transition-all flex items-center justify-center gap-2 shadow-lg"
                           >
                             <MessageCircle size={16} />
@@ -511,7 +635,7 @@ const DiscoverPage = () => {
           <div className="max-w-2xl mx-auto px-4 py-6">
             <div className="bg-gray-800 rounded-3xl shadow-[0_0_40px_rgba(0,0,0,0.3)] p-8 border border-gray-700">
               <h2 className="text-3xl font-bold text-white mb-8">Your Profile</h2>
-              
+
               <div className="flex items-center gap-6 mb-10">
                 <div className="w-24 h-24 bg-gradient-to-br from-pink-600 to-rose-600 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(236,72,153,0.5)]">
                   <User size={40} className="text-white" />
@@ -522,55 +646,117 @@ const DiscoverPage = () => {
                 </div>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <button 
-                  onClick={() => {
-                    setShowSettings(true);
-                    showToast('Settings opened');
-                  }}
-                  className="bg-gray-700/50 hover:bg-gray-700 rounded-2xl p-6 text-left transition-all border border-gray-600"
-                >
-                  <Settings className="text-gray-300 mb-3" size={28} />
-                  <p className="text-white font-bold text-lg mb-1">Settings</p>
-                  <p className="text-gray-400 text-sm">Manage preferences</p>
-                </button>
-                
-                <button 
-                  onClick={() => showToast('Verification process started!')}
-                  className="bg-gray-700/50 hover:bg-gray-700 rounded-2xl p-6 text-left transition-all border border-gray-600"
-                >
-                  <Shield className="text-blue-400 mb-3" size={28} />
-                  <p className="text-white font-bold text-lg mb-1">Get Verified</p>
-                  <p className="text-gray-400 text-sm">Increase trust</p>
-                </button>
-                
-                <button 
-                  onClick={() => showToast('Premium features coming soon! 🌟')}
-                  className="bg-gradient-to-br from-yellow-600/20 to-amber-600/20 hover:from-yellow-600/30 hover:to-amber-600/30 rounded-2xl p-6 text-left transition-all border border-yellow-600/50"
-                >
-                  <Zap className="text-yellow-400 mb-3" size={28} />
-                  <p className="text-white font-bold text-lg mb-1">Go Premium</p>
-                  <p className="text-gray-400 text-sm">Unlimited swipes</p>
-                </button>
-                
-                <button 
-                  onClick={() => showToast('Profile boosted for 30 minutes! 🚀')}
-                  className="bg-gradient-to-br from-pink-600/20 to-rose-600/20 hover:from-pink-600/30 hover:to-rose-600/30 rounded-2xl p-6 text-left transition-all border border-pink-600/50"
-                >
-                  <Sparkles className="text-pink-400 mb-3" size={28} />
-                  <p className="text-white font-bold text-lg mb-1">Boost Profile</p>
-                  <p className="text-gray-400 text-sm">Get more views</p>
-                </button>
-              </div>
 
-              <div className="mt-8 pt-6 border-t border-gray-700">
-                <button 
-                  onClick={() => showToast('Signed out successfully')}
-                  className="text-red-400 hover:text-red-300 font-semibold transition-colors"
+              <button
+                onClick={() => navigate('/premium')}
+                className="bg-gradient-to-br from-yellow-600/20 to-amber-600/20 hover:from-yellow-600/30 hover:to-amber-600/30 rounded-2xl p-6 text-left transition-all border border-yellow-600/50"
+              >
+                <Zap className="text-yellow-400 mb-3" size={28} />
+                <p className="text-white font-bold text-lg mb-1">Go Premium</p>
+                <p className="text-gray-400 text-sm">Unlimited swipes</p>
+              </button>
+
+              <button
+                onClick={() => showToast('Profile boosted for 30 minutes! 🚀')}
+                className="bg-gradient-to-br from-pink-600/20 to-rose-600/20 hover:from-pink-600/30 hover:to-rose-600/30 rounded-2xl p-6 text-left transition-all border border-pink-600/50"
+              >
+                <Sparkles className="text-pink-400 mb-3" size={28} />
+                <p className="text-white font-bold text-lg mb-1">Boost Profile</p>
+                <p className="text-gray-400 text-sm">Get more views</p>
+              </button>
+
+              {/* Collapsible Settings Section */}
+              <div className="mt-6">
+                <button
+                  onClick={() => setShowSettings(!showSettings)}
+                  className="w-full bg-gradient-to-br from-purple-900/20 to-indigo-900/20 hover:from-purple-900/30 hover:to-indigo-900/30 rounded-2xl p-6 text-left transition-all border border-purple-500/30 flex items-center justify-between group"
                 >
-                  Sign Out
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 bg-purple-500/10 rounded-full flex items-center justify-center group-hover:bg-purple-500/20 transition-colors">
+                      <Settings className="text-purple-400" size={24} />
+                    </div>
+                    <div>
+                      <p className="text-white font-bold text-lg mb-1">Settings</p>
+                      <p className="text-gray-400 text-sm">Preferences & Controls</p>
+                    </div>
+                  </div>
+                  <motion.div
+                    animate={{ rotate: showSettings ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <ChevronDown size={24} className="text-purple-400" />
+                  </motion.div>
                 </button>
+
+                <AnimatePresence>
+                  {showSettings && (
+                    <motion.div
+                      initial={{ height: 0, opacity: 0 }}
+                      animate={{ height: 'auto', opacity: 1 }}
+                      exit={{ height: 0, opacity: 0 }}
+                      transition={{ duration: 0.3, ease: 'easeInOut' }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pt-4 space-y-3">
+                        <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-xl border border-gray-700/50 backdrop-blur-sm">
+                          <div className="flex items-center gap-3">
+                            <Bell size={18} className="text-pink-500" />
+                            <span className="text-white font-medium">Notifications</span>
+                          </div>
+                          <Toggle
+                            checked={settings.notifications}
+                            onChange={() => toggleSetting('notifications')}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-xl border border-gray-700/50 backdrop-blur-sm">
+                          <div className="flex items-center gap-3">
+                            <MapPin size={18} className="text-blue-500" />
+                            <span className="text-white font-medium">Show Distance</span>
+                          </div>
+                          <Toggle
+                            checked={settings.showDistance}
+                            onChange={() => toggleSetting('showDistance')}
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between p-4 bg-gray-800/50 rounded-xl border border-gray-700/50 backdrop-blur-sm">
+                          <div className="flex items-center gap-3">
+                            <User size={18} className="text-purple-500" />
+                            <span className="text-white font-medium">Show Age</span>
+                          </div>
+                          <Toggle
+                            checked={settings.showAge}
+                            onChange={() => toggleSetting('showAge')}
+                          />
+                        </div>
+
+                        <button
+                          onClick={() => {
+                            showToast('Settings saved successfully! ✨');
+                            setShowSettings(false);
+                          }}
+                          className="w-full mt-2 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-500 hover:to-rose-500 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg hover:shadow-pink-500/25 active:scale-95 flex items-center justify-center gap-2"
+                        >
+                          <Check size={18} />
+                          Save Changes
+                        </button>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-gray-700">
+              <button
+                onClick={() => {
+                  logout();
+                }}
+                className="text-red-400 hover:text-red-300 font-semibold transition-colors"
+              >
+                Sign Out
+              </button>
             </div>
           </div>
         );
@@ -595,23 +781,21 @@ const DiscoverPage = () => {
           <div className="flex justify-around items-center py-3">
             <button
               onClick={() => setActiveTab('discover')}
-              className={`flex flex-col items-center gap-1.5 px-6 py-2 rounded-2xl transition-all ${
-                activeTab === 'discover'
-                  ? 'text-pink-500'
-                  : 'text-gray-500 hover:text-gray-300'
-              }`}
+              className={`flex flex-col items-center gap-1.5 px-6 py-2 rounded-2xl transition-all ${activeTab === 'discover'
+                ? 'text-pink-500'
+                : 'text-gray-500 hover:text-gray-300'
+                }`}
             >
               <Sparkles size={24} strokeWidth={2.5} />
               <span className="text-xs font-bold">Discover</span>
             </button>
-            
+
             <button
               onClick={() => setActiveTab('likes')}
-              className={`flex flex-col items-center gap-1.5 px-6 py-2 rounded-2xl transition-all relative ${
-                activeTab === 'likes'
-                  ? 'text-pink-500'
-                  : 'text-gray-500 hover:text-gray-300'
-              }`}
+              className={`flex flex-col items-center gap-1.5 px-6 py-2 rounded-2xl transition-all relative ${activeTab === 'likes'
+                ? 'text-pink-500'
+                : 'text-gray-500 hover:text-gray-300'
+                }`}
             >
               <Heart size={24} strokeWidth={2.5} />
               <span className="text-xs font-bold">Likes</span>
@@ -621,14 +805,13 @@ const DiscoverPage = () => {
                 </span>
               )}
             </button>
-            
+
             <button
               onClick={() => setActiveTab('matches')}
-              className={`flex flex-col items-center gap-1.5 px-6 py-2 rounded-2xl transition-all relative ${
-                activeTab === 'matches'
-                  ? 'text-pink-500'
-                  : 'text-gray-500 hover:text-gray-300'
-              }`}
+              className={`flex flex-col items-center gap-1.5 px-6 py-2 rounded-2xl transition-all relative ${activeTab === 'matches'
+                ? 'text-pink-500'
+                : 'text-gray-500 hover:text-gray-300'
+                }`}
             >
               <MessageCircle size={24} strokeWidth={2.5} />
               <span className="text-xs font-bold">Matches</span>
@@ -638,169 +821,130 @@ const DiscoverPage = () => {
                 </span>
               )}
             </button>
-            
+
             <button
               onClick={() => setActiveTab('profile')}
-              className={`flex flex-col items-center gap-1.5 px-6 py-2 rounded-2xl transition-all ${
-                activeTab === 'profile'
-                  ? 'text-pink-500'
-                  : 'text-gray-500 hover:text-gray-300'
-              }`}
+              className={`flex flex-col items-center gap-1.5 px-6 py-2 rounded-2xl transition-all ${activeTab === 'profile'
+                ? 'text-pink-500'
+                : 'text-gray-500 hover:text-gray-300'
+                }`}
             >
               <User size={24} strokeWidth={2.5} />
               <span className="text-xs font-bold">Profile</span>
             </button>
           </div>
+
+
         </div>
       </nav>
 
-      {/* Settings Modal */}
-      {showSettings && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowSettings(false)}>
-          <div className="bg-gray-800 rounded-3xl p-6 max-w-md w-full border border-gray-700 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-white">Settings</h3>
-              <button onClick={() => setShowSettings(false)} className="text-gray-400 hover:text-white transition-colors">
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="space-y-4">
-              <div className="flex items-center justify-between p-4 bg-gray-700/50 rounded-xl border border-gray-600">
-                <span className="text-white font-medium">Notifications</span>
-                <button className="w-12 h-6 bg-pink-600 rounded-full relative">
-                  <span className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></span>
-                </button>
-              </div>
-              
-              <div className="flex items-center justify-between p-4 bg-gray-700/50 rounded-xl border border-gray-600">
-                <span className="text-white font-medium">Show Distance</span>
-                <button className="w-12 h-6 bg-pink-600 rounded-full relative">
-                  <span className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></span>
-                </button>
-              </div>
-              
-              <div className="flex items-center justify-between p-4 bg-gray-700/50 rounded-xl border border-gray-600">
-                <span className="text-white font-medium">Show Age</span>
-                <button className="w-12 h-6 bg-pink-600 rounded-full relative">
-                  <span className="absolute right-1 top-1 w-4 h-4 bg-white rounded-full"></span>
-                </button>
-              </div>
-              
-              <button 
-                onClick={() => {
-                  showToast('Distance range updated');
-                  setShowSettings(false);
-                }}
-                className="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-semibold py-3 rounded-xl transition-all"
-              >
-                Save Changes
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
 
       {/* Filters Modal */}
-      {showFilters && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowFilters(false)}>
-          <div className="bg-gray-800 rounded-3xl p-6 max-w-md w-full border border-gray-700 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-white">Filters</h3>
-              <button onClick={() => setShowFilters(false)} className="text-gray-400 hover:text-white transition-colors">
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="space-y-6">
-              <div>
-                <label className="text-white font-medium mb-2 block">Distance (miles)</label>
-                <input type="range" min="1" max="100" defaultValue="50" className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
-                <div className="flex justify-between text-sm text-gray-400 mt-1">
-                  <span>1 mi</span>
-                  <span>100 mi</span>
-                </div>
+      {
+        showFilters && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setShowFilters(false)}>
+            <div className="bg-gray-800 rounded-3xl p-6 max-w-md w-full border border-gray-700 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-white">Filters</h3>
+                <button onClick={() => setShowFilters(false)} className="text-gray-400 hover:text-white transition-colors">
+                  <X size={24} />
+                </button>
               </div>
-              
-              <div>
-                <label className="text-white font-medium mb-2 block">Age Range</label>
-                <div className="flex gap-4">
-                  <input type="number" placeholder="Min" defaultValue="18" className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-xl border border-gray-600" />
-                  <input type="number" placeholder="Max" defaultValue="35" className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-xl border border-gray-600" />
+
+              <div className="space-y-6">
+                <div>
+                  <label className="text-white font-medium mb-2 block">Distance (miles)</label>
+                  <input type="range" min="1" max="100" defaultValue="50" className="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer" />
+                  <div className="flex justify-between text-sm text-gray-400 mt-1">
+                    <span>1 mi</span>
+                    <span>100 mi</span>
+                  </div>
                 </div>
+
+                <div>
+                  <label className="text-white font-medium mb-2 block">Age Range</label>
+                  <div className="flex gap-4">
+                    <input type="number" placeholder="Min" defaultValue="18" className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-xl border border-gray-600" />
+                    <input type="number" placeholder="Max" defaultValue="35" className="flex-1 bg-gray-700 text-white px-4 py-2 rounded-xl border border-gray-600" />
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => {
+                    showToast('Filters applied successfully');
+                    setShowFilters(false);
+                  }}
+                  className="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-semibold py-3 rounded-xl transition-all"
+                >
+                  Apply Filters
+                </button>
               </div>
-              
-              <button 
-                onClick={() => {
-                  showToast('Filters applied successfully');
-                  setShowFilters(false);
-                }}
-                className="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-semibold py-3 rounded-xl transition-all"
-              >
-                Apply Filters
-              </button>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Profile Details Modal */}
-      {showProfileDetails && (
-        <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end" onClick={() => setShowProfileDetails(false)}>
-          <div className="bg-gray-800 rounded-t-3xl p-6 w-full max-h-[80vh] overflow-y-auto border-t border-gray-700 shadow-2xl" onClick={(e) => e.stopPropagation()}>
-            <div className="flex items-center justify-between mb-6">
-              <h3 className="text-2xl font-bold text-white">{currentUser.name}'s Profile</h3>
-              <button onClick={() => setShowProfileDetails(false)} className="text-gray-400 hover:text-white transition-colors">
-                <X size={24} />
-              </button>
-            </div>
-            
-            <div className="space-y-6">
-              <div>
-                <h4 className="text-white font-semibold mb-2">About</h4>
-                <p className="text-gray-300">{currentUser.bio}</p>
+      {
+        showProfileDetails && (
+          <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-end" onClick={() => setShowProfileDetails(false)}>
+            <div className="bg-gray-800 rounded-t-3xl p-6 w-full max-h-[80vh] overflow-y-auto border-t border-gray-700 shadow-2xl" onClick={(e) => e.stopPropagation()}>
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-2xl font-bold text-white">{currentUser.name}'s Profile</h3>
+                <button onClick={() => setShowProfileDetails(false)} className="text-gray-400 hover:text-white transition-colors">
+                  <X size={24} />
+                </button>
               </div>
-              
-              <div>
-                <h4 className="text-white font-semibold mb-2">Details</h4>
-                <div className="space-y-2">
-                  <p className="text-gray-300"><span className="text-gray-400">Job:</span> {currentUser.job}</p>
-                  <p className="text-gray-300"><span className="text-gray-400">Education:</span> {currentUser.education}</p>
-                  <p className="text-gray-300"><span className="text-gray-400">Location:</span> {currentUser.location}</p>
+
+              <div className="space-y-6">
+                <div>
+                  <h4 className="text-white font-semibold mb-2">About</h4>
+                  <p className="text-gray-300">{currentUser.bio}</p>
                 </div>
-              </div>
-              
-              <div>
-                <h4 className="text-white font-semibold mb-2">Interests</h4>
-                <div className="flex flex-wrap gap-2">
-                  {currentUser.interests.map((interest, idx) => {
-                    const Icon = interestIcons[interest];
-                    return (
-                      <span
-                        key={idx}
-                        className="px-3 py-2 bg-gray-700/60 rounded-full text-xs text-white/90 font-medium border border-gray-600/50 flex items-center gap-1.5"
-                      >
-                        {Icon && <Icon size={14} />}
-                        {interest}
-                      </span>
-                    );
-                  })}
+
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Details</h4>
+                  <div className="space-y-2">
+                    <p className="text-gray-300"><span className="text-gray-400">Job:</span> {currentUser.job}</p>
+                    <p className="text-gray-300"><span className="text-gray-400">Education:</span> {currentUser.education}</p>
+                    <p className="text-gray-300"><span className="text-gray-400">Location:</span> {currentUser.location}</p>
+                  </div>
+                </div>
+
+                <div>
+                  <h4 className="text-white font-semibold mb-2">Interests</h4>
+                  <div className="flex flex-wrap gap-2">
+                    {currentUser.interests.map((interest, idx) => {
+                      const Icon = interestIcons[interest];
+                      return (
+                        <span
+                          key={idx}
+                          className="px-3 py-2 bg-gray-700/60 rounded-full text-xs text-white/90 font-medium border border-gray-600/50 flex items-center gap-1.5"
+                        >
+                          {Icon && <Icon size={14} />}
+                          {interest}
+                        </span>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       {/* Toast Notification */}
-      {showNotification && (
-        <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 animate-[slideDown_0.3s_ease-out]">
-          <div className="bg-gray-800 text-white px-6 py-3.5 rounded-full shadow-[0_0_40px_rgba(236,72,153,0.5)] flex items-center gap-2.5 border border-pink-500/30">
-            <Sparkles className="text-pink-400" size={18} />
-            <span className="font-semibold">{notificationMessage}</span>
+      {
+        showNotification && (
+          <div className="fixed top-24 left-1/2 transform -translate-x-1/2 z-50 animate-[slideDown_0.3s_ease-out]">
+            <div className="bg-gray-800 text-white px-6 py-3.5 rounded-full shadow-[0_0_40px_rgba(236,72,153,0.5)] flex items-center gap-2.5 border border-pink-500/30">
+              <Sparkles className="text-pink-400" size={18} />
+              <span className="font-semibold">{notificationMessage}</span>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }
 
       <style jsx>{`
         @keyframes slideDown {
@@ -814,8 +958,8 @@ const DiscoverPage = () => {
           }
         }
       `}</style>
-    </div>
+    </div >
   );
 };
 
-export default DiscoverPage;
+export default DiscoverPage; 

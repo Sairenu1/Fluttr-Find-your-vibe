@@ -1,22 +1,28 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Bell, Moon, MapPin, Globe, Users, Filter, Shield, Lock, ChevronRight } from 'lucide-react';
-// import GradientBackground from '../Layout/GradientBackground';
 import { GradientBackground } from "../Layouts/GradientBackground";
 import toast from 'react-hot-toast';
+import { useAuth } from '../../context/AuthContext';
 
 const SettingsPage = () => {
   const navigate = useNavigate();
-  const [notifications, setNotifications] = useState(true);
-  const [darkMode, setDarkMode] = useState(true);
-  const [location, setLocation] = useState(true);
+  const { preferences = {}, updatePreferences } = useAuth();
+
+  // Local state for immediate UI feedback, though typical context updates are fast enough
+  // We can just use preferences directly if we want
+
+  const handleToggle = (key) => {
+    updatePreferences({ [key]: !preferences[key] });
+    toast.success(`${key.charAt(0).toUpperCase() + key.slice(1)} ${!preferences[key] ? 'enabled' : 'disabled'}`);
+  };
 
   const settingsSections = [
     {
       title: "Account",
       items: [
-        { icon: <Bell size={18} />, label: "Email", value: "user@example.com" },
+        { icon: <Bell size={18} />, label: "Email", value: "user@example.com" }, // Could pull from user object
         { icon: <Lock size={18} />, label: "Change Password", action: true },
         { icon: <Shield size={18} />, label: "Privacy Settings", action: true }
       ]
@@ -24,26 +30,26 @@ const SettingsPage = () => {
     {
       title: "Preferences",
       items: [
-        { 
-          icon: <Bell size={18} />, 
-          label: "Push Notifications", 
-          toggle: true, 
-          value: notifications, 
-          onChange: setNotifications 
+        {
+          icon: <Bell size={18} />,
+          label: "Push Notifications",
+          toggle: true,
+          value: preferences.notifications,
+          key: 'notifications'
         },
-        { 
-          icon: <Moon size={18} />, 
-          label: "Dark Mode", 
-          toggle: true, 
-          value: darkMode, 
-          disabled: true 
+        {
+          icon: <Moon size={18} />,
+          label: "Dark Mode",
+          toggle: true,
+          value: preferences.darkMode,
+          key: 'darkMode'
         },
-        { 
-          icon: <MapPin size={18} />, 
-          label: "Location Services", 
-          toggle: true, 
-          value: location, 
-          onChange: setLocation 
+        {
+          icon: <MapPin size={18} />,
+          label: "Location Services",
+          toggle: true,
+          value: preferences.location,
+          key: 'location'
         }
       ]
     },
@@ -68,18 +74,18 @@ const SettingsPage = () => {
   return (
     <div className="settings-page">
       <GradientBackground />
-      
-      <div style={{ 
-        display: 'flex', 
-        alignItems: 'center', 
-        gap: '16px', 
+
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '16px',
         marginBottom: '30px',
         padding: '80px 20px 20px',
         maxWidth: '600px',
         margin: '0 auto'
       }}>
-        <motion.button 
-          onClick={() => navigate('/profile')} 
+        <motion.button
+          onClick={() => navigate('/profile')}
           whileHover={{ x: -3 }}
           whileTap={{ scale: 0.9 }}
           style={{
@@ -102,26 +108,26 @@ const SettingsPage = () => {
 
       <div style={{ maxWidth: '600px', margin: '0 auto', padding: '0 20px 100px' }}>
         {settingsSections.map((section, sectionIndex) => (
-          <motion.div 
-            key={sectionIndex} 
+          <motion.div
+            key={sectionIndex}
             className="settings-section"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: sectionIndex * 0.1 }}
           >
-            <h2 style={{ 
-              fontSize: '18px', 
-              fontWeight: '600', 
-              marginBottom: '20px', 
-              color: '#ff006e' 
+            <h2 style={{
+              fontSize: '18px',
+              fontWeight: '600',
+              marginBottom: '20px',
+              color: '#ff006e'
             }}>
               {section.title}
             </h2>
-            
+
             {section.items.map((item, itemIndex) => (
-              <div 
+              <div
                 key={itemIndex}
-                onClick={() => handleItemClick(item)}
+                onClick={() => !item.toggle && handleItemClick(item)}
                 style={{
                   display: 'flex',
                   alignItems: 'center',
@@ -135,15 +141,12 @@ const SettingsPage = () => {
                   <div style={{ color: '#ff006e' }}>{item.icon}</div>
                   <span style={{ fontSize: '14px' }}>{item.label}</span>
                 </div>
-                
+
                 {item.toggle ? (
-                  <motion.button 
+                  <motion.button
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (!item.disabled && item.onChange) {
-                        item.onChange(!item.value);
-                        toast.success(`${item.label} ${!item.value ? 'enabled' : 'disabled'}`);
-                      }
+                      handleToggle(item.key);
                     }}
                     style={{
                       width: '48px',
@@ -152,11 +155,10 @@ const SettingsPage = () => {
                       borderRadius: '13px',
                       border: 'none',
                       position: 'relative',
-                      cursor: item.disabled ? 'not-allowed' : 'pointer',
-                      opacity: item.disabled ? 0.5 : 1
+                      cursor: 'pointer',
                     }}
                   >
-                    <motion.div 
+                    <motion.div
                       animate={{ x: item.value ? 24 : 2 }}
                       style={{
                         position: 'absolute',
@@ -179,6 +181,8 @@ const SettingsPage = () => {
             ))}
           </motion.div>
         ))}
+
+        {/* Logout Button in Settings as well? Or just keep in Profile */}
       </div>
     </div>
   );

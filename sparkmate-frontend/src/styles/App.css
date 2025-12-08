@@ -1,9 +1,16 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap');
 
-* { 
-  margin: 0; 
-  padding: 0; 
-  box-sizing: border-box; 
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  overflow-x: hidden;
 }
 
 :root {
@@ -24,18 +31,21 @@
 }
 
 body {
+  margin: 0;
+  padding: 0;
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   background: linear-gradient(135deg, #0a0a0a 0%, #1a0a1a 50%, #0a0a0a 100%);
   background-attachment: fixed;
   color: var(--text-primary);
   min-height: 100vh;
+  height: 100%;
   overflow-x: hidden;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-.app { 
-  min-height: 100vh; 
+.app {
+  min-height: 100vh;
   position: relative;
   background: var(--bg-primary);
 }
@@ -47,7 +57,7 @@ body {
   backdrop-filter: blur(30px) saturate(180%);
   border-radius: 24px;
   border: 1px solid var(--border-color);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.3),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 }
@@ -86,8 +96,15 @@ body {
 }
 
 @keyframes gradient-shift {
-  0%, 100% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
 }
 
 /* Bottom Navigation */
@@ -161,7 +178,7 @@ body {
 
 /* Main Layout */
 .main-layout {
-  padding: 80px 0 100px;
+  padding: 20px 0;
   min-height: 100vh;
   max-width: 500px;
   margin: 0 auto;
@@ -243,7 +260,7 @@ body {
   outline: none;
   border-color: var(--pink-primary);
   background: rgba(20, 20, 30, 0.8);
-  box-shadow: 
+  box-shadow:
     0 0 0 4px rgba(255, 0, 110, 0.1),
     0 0 30px var(--pink-glow);
 }
@@ -255,7 +272,7 @@ body {
   border-radius: 24px;
   border: 1px solid var(--border-color);
   padding: 24px;
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
   transition: all 0.3s;
@@ -263,7 +280,7 @@ body {
 
 .card:hover {
   border-color: rgba(255, 0, 110, 0.4);
-  box-shadow: 
+  box-shadow:
     0 12px 48px rgba(0, 0, 0, 0.5),
     0 0 40px var(--pink-glow),
     inset 0 1px 0 rgba(255, 255, 255, 0.15);
@@ -301,7 +318,7 @@ body {
   border-radius: 32px;
   overflow: hidden;
   position: relative;
-  box-shadow: 
+  box-shadow:
     0 20px 60px rgba(0, 0, 0, 0.5),
     0 0 80px var(--pink-glow);
   border: 2px solid var(--border-color);
@@ -488,7 +505,7 @@ body {
 .match-card:hover {
   border-color: rgba(255, 0, 110, 0.4);
   transform: translateX(8px);
-  box-shadow: 
+  box-shadow:
     0 8px 32px rgba(0, 0, 0, 0.3),
     0 0 30px var(--pink-glow);
 }
@@ -507,8 +524,17 @@ body {
 }
 
 @keyframes pulse-online {
-  0%, 100% { opacity: 1; transform: scale(1); }
-  50% { opacity: 0.8; transform: scale(1.1); }
+
+  0%,
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 0.8;
+    transform: scale(1.1);
+  }
 }
 
 /* Profile Page */
@@ -528,7 +554,7 @@ body {
   border-radius: 50%;
   object-fit: cover;
   border: 4px solid var(--pink-primary);
-  box-shadow: 
+  box-shadow:
     0 0 40px var(--pink-glow),
     inset 0 0 20px rgba(255, 0, 110, 0.2);
   margin-bottom: 20px;
@@ -578,11 +604,11 @@ body {
   .main-layout {
     padding: 70px 0 90px;
   }
-  
+
   .swipe-container {
     height: 550px;
   }
-  
+
   .action-btn {
     width: 56px;
     height: 56px;
@@ -613,6 +639,7 @@ body {
     opacity: 0;
     transform: translateY(20px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -631,7 +658,7 @@ body {
   right: 0;
   bottom: 0;
   z-index: -1;
-  background: 
+  background:
     radial-gradient(circle at 20% 50%, rgba(255, 0, 110, 0.15) 0%, transparent 50%),
     radial-gradient(circle at 80% 80%, rgba(131, 56, 236, 0.15) 0%, transparent 50%),
     radial-gradient(circle at 40% 20%, rgba(255, 0, 110, 0.1) 0%, transparent 50%),
@@ -641,6 +668,13 @@ body {
 }
 
 @keyframes gradient-shift-bg {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.9; }
+
+  0%,
+  100% {
+    opacity: 1;
+  }
+
+  50% {
+    opacity: 0.9;
+  }
 }

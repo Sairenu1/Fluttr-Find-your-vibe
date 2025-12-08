@@ -2,14 +2,9 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { Camera, Heart, Eye, TrendingUp, Edit3, Crown, Settings, HelpCircle, Shield, LogOut, ChevronRight } from 'lucide-react';
-// import { GradientBackground } from "../../Layouts/GradientBackground";
-// import { GradientBackground } from "./GradientBackground";
 import { GradientBackground } from "../Layouts/GradientBackground";
-
-
 import { useAuth } from '../../context/AuthContext';
 import toast from 'react-hot-toast';
-// import { ArrowLeft, Bell, Moon, MapPin, Globe, Users, Filter, Shield, Lock, ChevronRight } from "lucide-react";
 
 const ProfilePage = () => {
   const { user, logout } = useAuth();
@@ -17,9 +12,6 @@ const ProfilePage = () => {
 
   const handleLogout = () => {
     logout();
-    toast.success('Logged out successfully', {
-      icon: '👋',
-    });
     navigate('/login');
   };
 
@@ -35,14 +27,14 @@ const ProfilePage = () => {
       title: "Edit Profile",
       subtitle: "Update your information",
       color: "#ff006e",
-      onClick: () => toast('Edit profile coming soon! ✨')
+      onClick: () => navigate('/edit-profile')
     },
     {
       icon: <Crown size={18} />,
       title: "Go Premium",
-      subtitle: "Unlock exclusive features",
+      subtitle: user?.isPremium ? "Manage Subscription" : "Unlock exclusive features",
       color: "#ffd700",
-      onClick: () => toast.success('Premium features coming soon! 👑')
+      onClick: () => navigate('/premium')
     },
     {
       icon: <Settings size={18} />,
@@ -77,30 +69,31 @@ const ProfilePage = () => {
   return (
     <div className="profile-page" style={{ padding: '80px 20px 100px', maxWidth: '500px', margin: '0 auto' }}>
       <GradientBackground />
-      
-      <motion.div 
+
+      <motion.div
         className="profile-header"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         style={{ textAlign: 'center', marginBottom: '40px' }}
       >
         <div className="profile-avatar-container" style={{ position: 'relative', display: 'inline-block', marginBottom: '20px' }}>
-          <img 
-            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" 
-            alt="Profile" 
+          <img
+            src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80"
+            alt="Profile"
             className="profile-avatar"
-            style={{ 
-              width: '120px', 
-              height: '120px', 
-              borderRadius: '50%', 
+            style={{
+              width: '120px',
+              height: '120px',
+              borderRadius: '50%',
               objectFit: 'cover',
-              border: '4px solid rgba(255, 0, 110, 0.3)'
+              border: `4px solid ${user?.isPremium ? '#ffd700' : 'rgba(255, 0, 110, 0.3)'}`
             }}
           />
           <motion.button
             className="edit-avatar-btn"
             whileHover={{ scale: 1.1 }}
             whileTap={{ scale: 0.9 }}
+            onClick={() => navigate('/edit-profile')}
             style={{
               position: 'absolute',
               bottom: '5px',
@@ -120,15 +113,15 @@ const ProfilePage = () => {
             <Camera size={16} color="white" />
           </motion.button>
         </div>
-        
+
         <h1 className="profile-name" style={{ fontSize: '28px', fontWeight: '700', marginBottom: '8px' }}>
           {user?.name || 'User'}
           {user?.isPremium && (
-            <span style={{ marginLeft: '8px' }}>👑</span>
+            <span style={{ marginLeft: '8px', fontSize: '24px' }} title="Premium Member">👑</span>
           )}
         </h1>
         <p className="profile-bio" style={{ color: 'rgba(255, 255, 255, 0.7)', fontSize: '14px' }}>
-          Digital creator • Adventure seeker • Coffee lover
+          {user?.bio || "Digital creator • Adventure seeker • Coffee lover"}
         </p>
       </motion.div>
 

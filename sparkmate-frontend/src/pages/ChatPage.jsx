@@ -1,39 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Send, MoreVertical } from 'lucide-react';
 import toast from 'react-hot-toast';
 import '../styles/ChatPage.css';
+import { useChat } from '../context/ChatContext';
 
 const ChatPage = () => {
   const { matchId } = useParams();
   const navigate = useNavigate();
+  const { getMatch, sendMessage } = useChat();
+  const [match, setMatch] = useState(null);
   const [message, setMessage] = useState('');
-  const [messages, setMessages] = useState([
-    { id: 1, text: "Hey! How are you?", sender: "them", time: "10:30 AM" },
-    { id: 2, text: "I'm great! How about you?", sender: "me", time: "10:32 AM" },
-    { id: 3, text: "Doing well, thanks! 😊", sender: "them", time: "10:33 AM" }
-  ]);
+  const messagesEndRef = useRef(null);
 
-  const matchUser = {
-    name: "Sarah Johnson",
-    photo: "https://i.pravatar.cc/100?img=1"
-  };
+  useEffect(() => {
+    const currentMatch = getMatch(matchId);
+    if (!currentMatch) {
+      toast.error('Match not found');
+      navigate('/matches');
+    } else {
+      setMatch(currentMatch);
+    }
+  }, [matchId, getMatch, navigate]);
+
+  useEffect(() => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [match?.messages]);
 
   const handleSend = (e) => {
     e.preventDefault();
     if (!message.trim()) return;
 
-    const newMessage = {
-      id: messages.length + 1,
-      text: message,
-      sender: "me",
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
-    };
-
-    setMessages([...messages, newMessage]);
+    sendMessage(matchId, message);
     setMessage('');
   };
+
+  if (!match) return <div>Loading...</div>;
 
   return (
     <div className="chat-page">
@@ -43,10 +46,10 @@ const ChatPage = () => {
             <ArrowLeft size={24} />
           </button>
           <div className="chat-user-info">
-            <img src={matchUser.photo} alt={matchUser.name} />
+            <img src={match.photo} alt={match.name} />
             <div>
-              <h3>{matchUser.name}</h3>
-              <span className="online-status">Active now</span>
+              <h3>{match.name}</h3>
+              <span className="online-status">{match.online ? 'Active now' : 'Offline'}</span>
             </div>
           </div>
           <button className="more-button">
@@ -55,7 +58,7 @@ const ChatPage = () => {
         </div>
 
         <div className="messages-container">
-          {messages.map((msg) => (
+          {match.messages && match.messages.map((msg) => (
             <motion.div
               key={msg.id}
               className={`message ${msg.sender}`}
@@ -68,6 +71,7 @@ const ChatPage = () => {
               </div>
             </motion.div>
           ))}
+          <div ref={messagesEndRef} />
         </div>
 
         <form className="message-input-container" onSubmit={handleSend}>

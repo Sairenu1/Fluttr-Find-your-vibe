@@ -79,6 +79,13 @@ public class Profile {
     @Builder.Default
     private Boolean vibeCheckCompleted = false;
 
+    public Integer calculateAge() {
+        if (dateOfBirth == null) {
+            return null;
+        }
+        return java.time.Period.between(dateOfBirth, java.time.LocalDate.now()).getYears();
+    }
+
     public enum Gender {
         MALE, FEMALE, NON_BINARY, OTHER
     }

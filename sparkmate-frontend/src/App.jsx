@@ -5,6 +5,7 @@ import { Toaster } from 'react-hot-toast';
 // Auth Components
 import LoginPage from './components/Auth/LoginPage';
 import SignUpPage from './components/Auth/SignUpPage';   // ✅ Correct component
+import ForgotPasswordPage from './components/Auth/ForgotPasswordPage';
 import PrivateRoute from './components/Auth/PrivateRoute';
 
 // Page Components
@@ -14,6 +15,8 @@ import LikesPage from './components/Likes/LikesPage';
 import MatchesPage from './components/Matches/MatchesPage';
 import ProfilePage from './components/Profile/ProfilePage';
 import SettingsPage from './components/Profile/SettingsPage';
+import PremiumPage from './components/Profile/PremiumPage';
+import EditProfilePage from './components/Profile/EditProfilePage';
 import ChatPage from './pages/ChatPage';
 import AdminDashboard from './components/Admin/AdminDashboard';
 import AdminRoute from './components/Admin/AdminRoute';
@@ -24,155 +27,159 @@ import BottomNav from './components/Layouts/BottomNav';
 
 // Context
 import { AuthProvider } from './context/AuthContext';
+import { ChatProvider } from './context/ChatContext';
 
 // Main Layout
 const MainLayout = ({ children }) => {
   return (
     <>
-      <NavigationBar />
       <div className="main-layout">{children}</div>
-      <BottomNav />
     </>
   );
 };
 
 function App() {
   return (
+
     <AuthProvider>
-      <BrowserRouter>
-        <div className="app">
-          <Toaster
-            position="top-center"
-            reverseOrder={false}
-            gutter={8}
-            toastOptions={{
-              duration: 3000,
-              style: {
-                background: 'rgba(0, 0, 0, 0.9)',
-                color: '#fff',
-                border: '1px solid rgba(255, 0, 110, 0.3)',
-                borderRadius: '12px',
-                backdropFilter: 'blur(10px)',
-                padding: '12px 20px',
-                fontSize: '14px',
-              },
-              success: {
+      <ChatProvider>
+        <BrowserRouter>
+          <div className="app">
+            <Toaster
+              position="top-center"
+              reverseOrder={false}
+              gutter={8}
+              toastOptions={{
                 duration: 3000,
-                iconTheme: { primary: '#ff006e', secondary: '#fff' },
                 style: {
                   background: 'rgba(0, 0, 0, 0.9)',
                   color: '#fff',
-                  border: '1px solid rgba(255, 0, 110, 0.5)',
+                  border: '1px solid rgba(255, 0, 110, 0.3)',
+                  borderRadius: '12px',
+                  backdropFilter: 'blur(10px)',
+                  padding: '12px 20px',
+                  fontSize: '14px',
                 },
-              },
-              error: {
-                duration: 4000,
-                iconTheme: { primary: '#ff4646', secondary: '#fff' },
-                style: {
-                  background: 'rgba(0, 0, 0, 0.9)',
-                  color: '#fff',
-                  border: '1px solid rgba(255, 70, 70, 0.5)',
+                success: {
+                  duration: 3000,
+                  iconTheme: { primary: '#ff006e', secondary: '#fff' },
+                  style: {
+                    background: 'rgba(0, 0, 0, 0.9)',
+                    color: '#fff',
+                    border: '1px solid rgba(255, 0, 110, 0.5)',
+                  },
                 },
-              },
-            }}
-          />
-
-          <Routes>
-            {/* Public Routes */}
-            <Route path="/" element={<Navigate to="/login" replace />} />
-            <Route path="/login" element={<LoginPage />} />
-            <Route path="/signup" element={<SignUpPage />} />   {/* ✅ FIXED */}
-
-            {/* Protected Routes */}
-            <Route
-              path="/discover"
-              element={
-                <PrivateRoute>
-                  <MainLayout>
-                    <DiscoverPage />
-                  </MainLayout>
-                </PrivateRoute>
-              }
+                error: {
+                  duration: 4000,
+                  iconTheme: { primary: '#ff4646', secondary: '#fff' },
+                  style: {
+                    background: 'rgba(0, 0, 0, 0.9)',
+                    color: '#fff',
+                    border: '1px solid rgba(255, 70, 70, 0.5)',
+                  },
+                },
+              }}
             />
 
-            <Route
-              path="/standouts"
-              element={
-                <PrivateRoute>
-                  <MainLayout>
-                    <StandoutsPage />
-                  </MainLayout>
-                </PrivateRoute>
-              }
-            />
+            <Routes>
+              {/* Public Routes */}
 
-            <Route
-              path="/likes"
-              element={
-                <PrivateRoute>
-                  <MainLayout>
-                    <LikesPage />
-                  </MainLayout>
-                </PrivateRoute>
-              }
-            />
+              <Route path="/" element={<Navigate to="/login" replace />} />
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/signup" element={<SignUpPage />} />
+              <Route path="/forgot-password" element={<ForgotPasswordPage />} />
 
-            <Route
-              path="/matches"
-              element={
-                <PrivateRoute>
-                  <MainLayout>
-                    <MatchesPage />
-                  </MainLayout>
-                </PrivateRoute>
-              }
-            />
+              {/* Protected Routes */}
+              <Route
+                path="/discover"
+                element={
+                  <PrivateRoute>
+                    <MainLayout>
+                      <DiscoverPage />
+                    </MainLayout>
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/profile"
-              element={
-                <PrivateRoute>
-                  <MainLayout>
-                    <ProfilePage />
-                  </MainLayout>
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/standouts"
+                element={
+                  <PrivateRoute>
+                    <MainLayout>
+                      <StandoutsPage />
+                    </MainLayout>
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/settings"
-              element={
-                <PrivateRoute>
-                  <MainLayout>
-                    <SettingsPage />
-                  </MainLayout>
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/likes"
+                element={
+                  <PrivateRoute>
+                    <MainLayout>
+                      <LikesPage />
+                    </MainLayout>
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/chat/:matchId"
-              element={
-                <PrivateRoute>
-                  <ChatPage />
-                </PrivateRoute>
-              }
-            />
+              <Route
+                path="/matches"
+                element={
+                  <PrivateRoute>
+                    <MainLayout>
+                      <MatchesPage />
+                    </MainLayout>
+                  </PrivateRoute>
+                }
+              />
 
-            <Route
-              path="/admin"
-              element={
-                <AdminRoute>
-                  <AdminDashboard />
-                </AdminRoute>
-              }
-            />
+              <Route
+                path="/profile"
+                element={
+                  <PrivateRoute>
+                    <MainLayout>
+                      <ProfilePage />
+                    </MainLayout>
+                  </PrivateRoute>
+                }
+              />
 
-            {/* Catch-all Route */}
-            <Route path="*" element={<Navigate to="/login" replace />} />
-          </Routes>
-        </div>
-      </BrowserRouter>
+              <Route
+                path="/settings"
+                element={
+                  <PrivateRoute>
+                    <MainLayout>
+                      <SettingsPage />
+                    </MainLayout>
+                  </PrivateRoute>
+                }
+              />
+
+              <Route
+                path="/chat/:matchId"
+                element={
+                  <PrivateRoute>
+                    <ChatPage />
+                  </PrivateRoute>
+                }
+              />
+
+              <Route
+                path="/admin"
+                element={
+                  <AdminRoute>
+                    <AdminDashboard />
+                  </AdminRoute>
+                }
+              />
+
+              {/* Catch-all Route */}
+              <Route path="*" element={<Navigate to="/login" replace />} />
+            </Routes>
+          </div>
+        </BrowserRouter>
+      </ChatProvider>
     </AuthProvider>
   );
 }

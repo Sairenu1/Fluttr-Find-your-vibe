@@ -3,10 +3,10 @@ import { useAuth } from '../../context/AuthContext';
 import { Heart } from 'lucide-react';
 
 const PrivateRoute = ({ children }) => {
-  const { user, isAuthenticated } = useAuth();
+  const { isAuthenticated } = useAuth();
 
   // If not authenticated, redirect to login
-  if (!isAuthenticated && !user) {
+  if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 

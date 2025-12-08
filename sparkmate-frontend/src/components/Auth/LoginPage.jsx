@@ -1,57 +1,75 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
-import { Mail, Lock, Heart } from 'lucide-react';
+import { Mail, Lock, Heart, Sparkles, Star } from 'lucide-react';
 
-// Falling Hearts Component
-const FallingHearts = () => {
-  const hearts = Array.from({ length: 15 }, (_, i) => ({
+// Floating Elements Component
+const FloatingElements = () => {
+  const elements = Array.from({ length: 20 }, (_, i) => ({
     id: i,
     left: `${Math.random() * 100}%`,
-    delay: Math.random() * 5,
-    duration: 3 + Math.random() * 4,
-    size: 10 + Math.random() * 20
+    delay: Math.random() * 8,
+    duration: 4 + Math.random() * 6,
+    size: 8 + Math.random() * 16,
+    type: i % 3 === 0 ? 'heart' : i % 3 === 1 ? 'sparkle' : 'star'
   }));
 
   return (
     <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
-      {hearts.map((heart) => (
+      {elements.map((el) => (
         <div
-          key={heart.id}
-          className="absolute animate-fall opacity-30"
+          key={el.id}
+          className="absolute animate-float-up"
           style={{
-            left: heart.left,
-            animationDelay: `${heart.delay}s`,
-            animationDuration: `${heart.duration}s`,
-            top: '-50px'
+            left: el.left,
+            animationDelay: `${el.delay}s`,
+            animationDuration: `${el.duration}s`,
+            bottom: '-50px'
           }}
         >
-          <Heart 
-            size={heart.size} 
-            fill="rgba(255, 105, 180, 0.6)" 
-            color="rgba(255, 105, 180, 0.8)" 
-          />
+          {el.type === 'heart' && (
+            <Heart
+              size={el.size}
+              fill="rgba(255, 0, 110, 0.4)"
+              color="rgba(255, 0, 110, 0.6)"
+            />
+          )}
+          {el.type === 'sparkle' && (
+            <Sparkles
+              size={el.size}
+              fill="rgba(168, 85, 247, 0.4)"
+              color="rgba(168, 85, 247, 0.6)"
+            />
+          )}
+          {el.type === 'star' && (
+            <Star
+              size={el.size}
+              fill="rgba(236, 72, 153, 0.4)"
+              color="rgba(236, 72, 153, 0.6)"
+            />
+          )}
         </div>
       ))}
       <style>{`
-        @keyframes fall {
+        @keyframes float-up {
           0% {
-            transform: translateY(0) rotate(0deg);
+            transform: translateY(0) rotate(0deg) scale(0);
             opacity: 0;
           }
           10% {
-            opacity: 0.6;
+            opacity: 0.8;
+            transform: scale(1);
           }
           90% {
-            opacity: 0.6;
+            opacity: 0.8;
           }
           100% {
-            transform: translateY(100vh) rotate(360deg);
+            transform: translateY(-100vh) rotate(360deg) scale(0.5);
             opacity: 0;
           }
         }
-        .animate-fall {
-          animation: fall linear infinite;
+        .animate-float-up {
+          animation: float-up linear infinite;
         }
       `}</style>
     </div>
@@ -60,26 +78,21 @@ const FallingHearts = () => {
 
 const LoginPage = () => {
   const navigate = useNavigate();
-  const { login, user } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
 
-  // Redirect if already logged in (only after checking user exists)
+  // Redirect if already logged in
   useEffect(() => {
-    // Small delay to ensure page renders first
-    const timer = setTimeout(() => {
-      if (user) {
-        navigate('/discover', { replace: true });
-      }
-    }, 100);
-    return () => clearTimeout(timer);
-  }, [user, navigate]);
+    if (isAuthenticated) {
+      navigate('/discover', { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Validation
+
     if (!email || !password) {
       return;
     }
@@ -88,9 +101,8 @@ const LoginPage = () => {
 
     try {
       const result = await login(email, password);
-      
+
       if (result.success) {
-        // Redirect to discover page
         setTimeout(() => {
           navigate('/discover', { replace: true });
         }, 500);
@@ -103,133 +115,209 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden">
-      {/* Animated Gradient Background */}
-      <div className="absolute inset-0 bg-gradient-to-br from-pink-400 via-purple-400 to-indigo-500 animate-gradient-shift">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_50%,rgba(236,72,153,0.1),transparent)]"></div>
+    <div className="min-h-screen relative flex items-center justify-center p-4 overflow-hidden" style={{ background: '#0a0a0a' }}>
+      {/* Animated Dark Gradient Background */}
+      <div className="absolute inset-0 bg-gradient-dark">
+        <div className="absolute inset-0 bg-gradient-radial"></div>
       </div>
-      
-      <FallingHearts />
-      
+
+      <FloatingElements />
+
       {/* Login Card */}
       <div className="relative z-10 w-full max-w-md">
-        <div className="bg-gray-100/95 backdrop-blur-xl rounded-3xl shadow-2xl p-8 md:p-10 transform transition-all duration-500 hover:shadow-pink-500/30">
-          {/* Logo */}
-          <div className="flex justify-center mb-6">
+        <div className="glass-card-dark p-8 md:p-10 transform transition-all duration-500">
+          {/* Logo with Glow */}
+          <div className="flex justify-center mb-8">
             <div className="relative">
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-full blur-xl opacity-50 animate-pulse"></div>
-              <div className="relative bg-gradient-to-br from-pink-500 to-purple-600 rounded-full p-5 shadow-lg transform hover:scale-110 transition-transform duration-300">
-                <Heart size={40} fill="currentColor" color="currentColor" className="animate-bounce text-gray-100" style={{ animationDuration: '2s' }} />
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 rounded-full blur-2xl opacity-60 animate-pulse-glow"></div>
+              <div className="relative bg-gradient-to-br from-pink-500 via-purple-600 to-pink-500 rounded-full p-6 shadow-2xl transform hover:scale-110 transition-all duration-300 animate-float">
+                <Heart size={48} fill="white" color="white" className="drop-shadow-2xl" />
               </div>
             </div>
           </div>
 
           {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold text-center mb-2 bg-gradient-to-r from-pink-600 to-purple-600 bg-clip-text text-transparent">
-            SparkMate
-          </h1>
-          <p className="text-center text-gray-600 mb-8 text-sm md:text-base">
-            Find your perfect match ✨
-          </p>
+          <div className="text-center mb-8">
+            <h1 className="text-5xl md:text-6xl font-black mb-3 bg-gradient-to-r from-pink-400 via-purple-400 to-pink-400 bg-clip-text text-transparent animate-gradient-text">
+              Fluttr
+            </h1>
+            <p className="text-gray-400 text-base flex items-center justify-center gap-2">
+              <Sparkles size={16} className="text-purple-400" />
+              Find your vibe ✨
+              <Sparkles size={16} className="text-pink-400" />
+            </p>
+          </div>
 
           {/* Form */}
           <div className="space-y-5">
             {/* Email Input */}
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-              <div className="relative flex items-center bg-gray-50 rounded-xl border-2 border-gray-200 focus-within:border-pink-500 focus-within:bg-gray-100 transition-all duration-300">
-                <Mail className="absolute left-4 text-gray-400 group-focus-within:text-pink-500 transition-colors" size={20} />
+              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-2xl blur-md opacity-0 group-hover:opacity-30 group-focus-within:opacity-40 transition-opacity duration-300"></div>
+              <div className="relative flex items-center bg-white/5 rounded-2xl border-2 border-white/10 focus-within:border-pink-500/50 focus-within:bg-white/10 backdrop-blur-xl transition-all duration-300">
+                <Mail className="absolute left-5 text-gray-500 group-focus-within:text-pink-400 transition-colors" size={20} />
                 <input
                   type="email"
-                  placeholder="Enter your email"
+                  placeholder="your email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSubmit(e)}
                   required
                   disabled={loading}
-                  className="w-full pl-12 pr-4 py-3.5 bg-transparent outline-none text-gray-700 placeholder-gray-400 disabled:opacity-50"
+                  className="w-full pl-14 pr-5 py-4 bg-transparent outline-none text-white placeholder-gray-500 disabled:opacity-50 font-medium"
                 />
               </div>
             </div>
 
             {/* Password Input */}
             <div className="relative group">
-              <div className="absolute inset-0 bg-gradient-to-r from-pink-500 to-purple-500 rounded-xl blur opacity-0 group-hover:opacity-20 transition-opacity duration-300"></div>
-              <div className="relative flex items-center bg-gray-50 rounded-xl border-2 border-gray-200 focus-within:border-pink-500 focus-within:bg-gray-100 transition-all duration-300">
-                <Lock className="absolute left-4 text-gray-400 group-focus-within:text-pink-500 transition-colors" size={20} />
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-500 to-pink-500 rounded-2xl blur-md opacity-0 group-hover:opacity-30 group-focus-within:opacity-40 transition-opacity duration-300"></div>
+              <div className="relative flex items-center bg-white/5 rounded-2xl border-2 border-white/10 focus-within:border-purple-500/50 focus-within:bg-white/10 backdrop-blur-xl transition-all duration-300">
+                <Lock className="absolute left-5 text-gray-500 group-focus-within:text-purple-400 transition-colors" size={20} />
                 <input
                   type="password"
-                  placeholder="Enter your password"
+                  placeholder="your password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && handleSubmit(e)}
                   required
                   disabled={loading}
-                  className="w-full pl-12 pr-4 py-3.5 bg-transparent outline-none text-gray-700 placeholder-gray-400 disabled:opacity-50"
+                  className="w-full pl-14 pr-5 py-4 bg-transparent outline-none text-white placeholder-gray-500 disabled:opacity-50 font-medium"
                 />
               </div>
+            </div>
+
+            {/* Forgot Password Link */}
+            <div className="flex justify-end mt-2">
+              <button
+                type="button"
+                onClick={() => navigate('/forgot-password')}
+                className="text-sm text-gray-400 hover:text-pink-400 transition-colors duration-300 font-medium"
+              >
+                Forgot Password?
+              </button>
             </div>
 
             {/* Submit Button */}
             <button
               onClick={handleSubmit}
               disabled={loading || !email || !password}
-              className="w-full bg-gradient-to-r from-pink-500 to-purple-600 text-gray-100 font-semibold py-4 rounded-xl shadow-lg hover:shadow-pink-500/50 transform hover:scale-105 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none relative overflow-hidden group"
+              className="w-full bg-gradient-to-r from-pink-500 via-purple-500 to-pink-500 text-white font-bold py-5 rounded-2xl shadow-2xl hover:shadow-pink-500/50 transform hover:scale-105 hover:-translate-y-1 active:scale-95 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none relative overflow-hidden group mt-6 bg-[length:200%_100%] animate-gradient-shift"
             >
-              <span className="relative z-10">
+              <span className="relative z-10 flex items-center justify-center gap-2 text-lg">
                 {loading ? (
-                  <span className="flex items-center justify-center gap-2">
+                  <>
                     <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24">
                       <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none"></circle>
                       <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
-                    Signing in...
-                  </span>
+                    signing in...
+                  </>
                 ) : (
-                  'Sign In'
+                  <>
+                    <Heart size={18} fill="white" />
+                    let's go
+                    <Sparkles size={18} />
+                  </>
                 )}
               </span>
-              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 to-pink-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-purple-600 via-pink-600 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-500 bg-[length:200%_100%] animate-gradient-shift"></div>
             </button>
           </div>
 
           {/* Divider */}
-          <div className="flex items-center my-6">
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
-            <span className="px-4 text-gray-400 text-sm font-medium">or</span>
-            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-gray-300 to-transparent"></div>
+          <div className="flex items-center my-8">
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-pink-500/30 to-transparent"></div>
+            <span className="px-4 text-gray-500 text-sm font-semibold">or</span>
+            <div className="flex-1 h-px bg-gradient-to-r from-transparent via-purple-500/30 to-transparent"></div>
           </div>
 
           {/* Sign Up Link */}
-          <div className="text-center text-gray-600 text-sm md:text-base">
-            Don't have an account?{' '}
-            <button 
+          <div className="text-center text-gray-400">
+            new here?{' '}
+            <button
               onClick={() => navigate('/signup')}
-              className="text-pink-600 font-semibold hover:text-purple-600 transition-colors duration-300 hover:underline"
+              className="text-transparent bg-gradient-to-r from-pink-400 to-purple-400 bg-clip-text font-bold hover:from-pink-300 hover:to-purple-300 transition-all duration-300 hover:scale-105 inline-block"
             >
-              Create one
+              create account ✨
             </button>
           </div>
         </div>
 
-        {/* Bottom Decorative Elements */}
-        <div className="mt-8 text-center text-gray-100/80 text-xs md:text-sm">
-          <p>💕 Where hearts connect and love begins 💕</p>
+        {/* Bottom Text */}
+        <div className="mt-8 text-center">
+          <p className="text-gray-500 text-sm flex items-center justify-center gap-2">
+            <Heart size={14} className="text-pink-500 animate-pulse" fill="currentColor" />
+            find your vibe
+            <Star size={14} className="text-purple-500 animate-pulse" fill="currentColor" />
+          </p>
         </div>
       </div>
 
       <style>{`
-        @keyframes gradient-shift {
-          0%, 100% {
-            background-position: 0% 50%;
-          }
-          50% {
-            background-position: 100% 50%;
-          }
+        .bg-gradient-dark {
+          background: linear-gradient(135deg, #0a0a0a 0%, #1a0520 25%, #0a0a0a 50%, #0f0520 75%, #0a0a0a 100%);
+          background-size: 400% 400%;
+          animation: gradient-shift-bg 20s ease infinite;
         }
+
+        .bg-gradient-radial {
+          background: 
+            radial-gradient(circle at 20% 30%, rgba(255, 0, 110, 0.15) 0%, transparent 40%),
+            radial-gradient(circle at 80% 70%, rgba(168, 85, 247, 0.15) 0%, transparent 40%),
+            radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.1) 0%, transparent 50%);
+        }
+
+        .glass-card-dark {
+          background: rgba(15, 15, 25, 0.7);
+          backdrop-filter: blur(40px) saturate(180%);
+          border-radius: 32px;
+          border: 2px solid rgba(255, 255, 255, 0.1);
+          box-shadow: 
+            0 20px 60px rgba(0, 0, 0, 0.5),
+            0 0 80px rgba(255, 0, 110, 0.2),
+            inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes gradient-shift-bg {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+
+        @keyframes gradient-shift {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+
         .animate-gradient-shift {
+          animation: gradient-shift 3s ease infinite;
+        }
+
+        @keyframes gradient-text {
+          0%, 100% { background-position: 0% 50%; }
+          50% { background-position: 100% 50%; }
+        }
+
+        .animate-gradient-text {
           background-size: 200% 200%;
-          animation: gradient-shift 15s ease infinite;
+          animation: gradient-text 4s ease infinite;
+        }
+
+        @keyframes pulse-glow {
+          0%, 100% { opacity: 0.4; transform: scale(1); }
+          50% { opacity: 0.8; transform: scale(1.1); }
+        }
+
+        .animate-pulse-glow {
+          animation: pulse-glow 3s ease infinite;
+        }
+
+        @keyframes float {
+          0%, 100% { transform: translateY(0px) rotate(0deg); }
+          50% { transform: translateY(-10px) rotate(5deg); }
+        }
+
+        .animate-float {
+          animation: float 3s ease-in-out infinite;
         }
       `}</style>
     </div>

@@ -5,11 +5,15 @@ import {
   Heart, X, Star, MessageCircle, User, Sparkles, MapPin,
   Plane, Dumbbell, Camera, Music, Book, Palette, Dog, Pizza,
   Info, Shield, Zap, Settings, Coffee, Check, Bell, Filter,
-  ArrowLeft, ChevronRight, ChevronDown, LogOut
+  ArrowLeft, ChevronRight, ChevronDown, LogOut, RotateCcw, Flag
 } from 'lucide-react';
 
 import { motion, AnimatePresence } from 'framer-motion';
 import Toggle from '../UI/Toggle';
+import ReportModal from '../UI/ReportModal';
+import PaymentModal from '../Profile/PaymentModal';
+import ProfileCompletion from '../UI/ProfileCompletion';
+import IcebreakerPrompts from '../UI/IcebreakerPrompts';
 import useGeolocation from '../../hooks/useGeolocation';
 
 const DiscoverPage = () => {
@@ -29,6 +33,14 @@ const DiscoverPage = () => {
   const [showFilters, setShowFilters] = useState(false);
   const [showProfileDetails, setShowProfileDetails] = useState(false);
   const [notifications, setNotifications] = useState(2);
+  const [lastSwipedUser, setLastSwipedUser] = useState(null);
+  const [lastSwipeAction, setLastSwipeAction] = useState(null);
+  const [showReportModal, setShowReportModal] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [isPremium, setIsPremium] = useState(false);
+  const [blockedUsers, setBlockedUsers] = useState([]);
+  const [showIcebreaker, setShowIcebreaker] = useState(false);
+  const [selectedMatchForIcebreaker, setSelectedMatchForIcebreaker] = useState(null);
   const [settings, setSettings] = useState({
     notifications: true,
     showDistance: false,
@@ -273,6 +285,8 @@ const DiscoverPage = () => {
 
   const handleLike = () => {
     animateSwipe('right', () => {
+      setLastSwipedUser(currentUser);
+      setLastSwipeAction('like');
       setLikedUsers([...likedUsers, currentUser]);
       showToast(`You liked ${currentUser.name}! 💕`);
 
@@ -287,6 +301,8 @@ const DiscoverPage = () => {
 
   const handlePass = () => {
     animateSwipe('left', () => {
+      setLastSwipedUser(currentUser);
+      setLastSwipeAction('pass');
       showToast(`Passed on ${currentUser.name}`);
       nextProfile();
     });
@@ -295,6 +311,8 @@ const DiscoverPage = () => {
   const handleSuperLike = () => {
     if (superLikes > 0) {
       animateSwipe('up', () => {
+        setLastSwipedUser(currentUser);
+        setLastSwipeAction('superlike');
         setSuperLikes(superLikes - 1);
         setLikedUsers([...likedUsers, { ...currentUser, superLiked: true }]);
 
@@ -320,6 +338,37 @@ const DiscoverPage = () => {
     } else {
       setCurrentIndex(0);
     }
+  };
+
+  const handleUndo = () => {
+    if (!lastSwipedUser) {
+      showToast('No swipe to undo!');
+      return;
+    }
+
+    // Restore the previous profile
+    const previousIndex = users.findIndex(u => u.id === lastSwipedUser.id);
+    if (previousIndex !== -1) {
+      setCurrentIndex(previousIndex);
+
+      // Remove from liked users if it was a like
+      if (lastSwipeAction === 'like' || lastSwipeAction === 'superlike') {
+        setLikedUsers(prev => prev.filter(u => u.id !== lastSwipedUser.id));
+        setMatches(prev => prev.filter(u => u.id !== lastSwipedUser.id));
+        if (lastSwipeAction === 'superlike') {
+          setSuperLikes(prev => prev + 1);
+        }
+      }
+
+      showToast(`Undid swipe on ${lastSwipedUser.name} ↩️`);
+      setLastSwipedUser(null);
+      setLastSwipeAction(null);
+    }
+  };
+
+  const handleBlockUser = (userId) => {
+    setBlockedUsers(prev => [...prev, userId]);
+    nextProfile();
   };
 
   const nextImage = () => {
@@ -375,7 +424,7 @@ const DiscoverPage = () => {
     switch (activeTab) {
       case 'discover':
         return (
-          <div className="flex items-center justify-center min-h-[calc(100vh-180px)] px-4">
+          <div className="flex items-center justify-center h-[calc(100vh-80px)] px-4 py-2">
             <div className="w-full max-w-md">
               <div
                 className="relative bg-gray-800 rounded-[28px] overflow-hidden shadow-[0_0_60px_rgba(236,72,153,0.3),0_0_30px_rgba(239,68,68,0.2)]"
@@ -386,11 +435,11 @@ const DiscoverPage = () => {
                 }}
               >
                 {/* Image Section */}
-                <div className="relative h-[520px] overflow-hidden rounded-t-[28px]">
+                <div className="relative h-[300px] overflow-hidden rounded-t-[20px]">
                   <img
                     src={currentUser.images[imageIndex]}
                     alt={currentUser.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover object-top"
                   />
 
                   {/* Progress Bars */}
@@ -426,60 +475,52 @@ const DiscoverPage = () => {
                   <div className="absolute inset-0 bg-gradient-to-b from-black/40 via-transparent to-transparent"></div>
 
                   {/* User Info Overlay */}
-                  <div className="absolute bottom-0 left-0 right-0 p-5 text-white">
-                    <div className="flex items-center justify-between mb-3">
+                  <div className="absolute bottom-0 left-0 right-0 p-3 text-white">
+                    <div className="flex items-center justify-between mb-1">
                       <div className="flex items-center gap-2">
-                        <h2 className="text-3xl font-bold tracking-tight">
+                        <h2 className="text-2xl font-bold tracking-tight">
                           {currentUser.name}, {currentUser.age}
                         </h2>
                         {currentUser.verified && (
-                          <div className="w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center">
-                            <Check size={14} className="text-white" strokeWidth={3} />
+                          <div className="w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center">
+                            <Check size={12} className="text-white" strokeWidth={3} />
                           </div>
                         )}
                       </div>
                       <button
                         onClick={() => setShowProfileDetails(!showProfileDetails)}
-                        className="w-10 h-10 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/30 transition-all"
+                        className="w-8 h-8 bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center hover:bg-white/30 transition-all"
                       >
-                        <Info size={18} className="text-white" />
+                        <Info size={14} className="text-white" />
                       </button>
                     </div>
-
-                    <p className="text-sm font-medium text-white/90 mb-1">{currentUser.job}</p>
-
-                    <button className="flex items-center gap-1.5 text-white/90 text-sm mb-3 hover:text-white transition-colors">
-                      <span className="w-6 h-6 bg-white/20 backdrop-blur-sm rounded-full flex items-center justify-center">
-                        <Camera size={12} />
-                      </span>
-                      React to photo
-                    </button>
+                    <p className="text-xs font-medium text-white/90">{currentUser.job}</p>
                   </div>
                 </div>
 
                 {/* Info Section */}
-                <div className="bg-gray-800 p-5">
-                  <p className="text-white/90 text-sm leading-relaxed mb-4">
+                <div className="bg-gray-800 p-3">
+                  <p className="text-white/90 text-xs leading-relaxed mb-2 line-clamp-2">
                     {currentUser.bio}
                   </p>
 
                   {/* Location */}
-                  <div className="flex items-center gap-2 mb-4 pb-4 border-b border-gray-700">
-                    <div className="w-10 h-10 bg-gray-700/50 rounded-full flex items-center justify-center">
-                      <MapPin size={18} className="text-white/70" />
+                  <div className="flex items-center gap-2 mb-2 pb-2 border-b border-gray-700">
+                    <div className="w-7 h-7 bg-gray-700/50 rounded-full flex items-center justify-center">
+                      <MapPin size={14} className="text-white/70" />
                     </div>
                     <div>
-                      <p className="text-white/90 text-sm font-medium">{currentUser.location}</p>
-                      <p className="text-white/60 text-xs">{currentUser.distance}</p>
+                      <p className="text-white/90 text-xs font-medium">{currentUser.location}</p>
+                      <p className="text-white/60 text-[10px]">{currentUser.distance}</p>
                     </div>
                   </div>
 
                   {/* Tags */}
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {currentUser.tags.map((tag, idx) => (
+                  <div className="flex flex-wrap gap-1 mb-2">
+                    {currentUser.tags.slice(0, 4).map((tag, idx) => (
                       <span
                         key={idx}
-                        className="px-3 py-1.5 bg-gray-700/60 rounded-full text-xs text-white/90 font-medium border border-gray-600/50"
+                        className="px-2 py-1 bg-gray-700/60 rounded-full text-[10px] text-white/90 font-medium border border-gray-600/50"
                       >
                         {tag}
                       </span>
@@ -487,15 +528,15 @@ const DiscoverPage = () => {
                   </div>
 
                   {/* Interests */}
-                  <div className="flex flex-wrap gap-2">
-                    {currentUser.interests.map((interest, idx) => {
+                  <div className="flex flex-wrap gap-1">
+                    {currentUser.interests.slice(0, 4).map((interest, idx) => {
                       const Icon = interestIcons[interest];
                       return (
                         <span
                           key={idx}
-                          className="px-3 py-2 bg-gray-700/60 rounded-full text-xs text-white/90 font-medium border border-gray-600/50 flex items-center gap-1.5"
+                          className="px-2 py-1 bg-gray-700/60 rounded-full text-[10px] text-white/90 font-medium border border-gray-600/50 flex items-center gap-1"
                         >
-                          {Icon && <Icon size={14} />}
+                          {Icon && <Icon size={10} />}
                           {interest}
                         </span>
                       );
@@ -505,34 +546,57 @@ const DiscoverPage = () => {
               </div>
 
               {/* Action Buttons */}
-              <div className="flex justify-center items-center gap-5 mt-6">
+              <div className="flex justify-center items-center gap-3 mt-3">
+                {/* Report Button */}
+                <button
+                  onClick={() => setShowReportModal(true)}
+                  disabled={isAnimating}
+                  className="w-9 h-9 bg-gray-800 rounded-full flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 border border-gray-600 disabled:opacity-50"
+                  title="Report user"
+                >
+                  <Flag size={14} className="text-gray-400" />
+                </button>
+
+                {/* Undo Button */}
+                <button
+                  onClick={handleUndo}
+                  disabled={isAnimating || !lastSwipedUser}
+                  className="w-10 h-10 bg-gray-800 rounded-full flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 shadow-[0_0_15px_rgba(251,191,36,0.3)] hover:shadow-[0_0_25px_rgba(251,191,36,0.5)] border-2 border-yellow-500/30 disabled:opacity-30"
+                  title="Undo last swipe"
+                >
+                  <RotateCcw size={16} className="text-yellow-500" />
+                </button>
+
+                {/* Pass Button */}
                 <button
                   onClick={handlePass}
                   disabled={isAnimating}
-                  className="w-16 h-16 bg-gray-800 rounded-full flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 shadow-[0_0_30px_rgba(239,68,68,0.4)] hover:shadow-[0_0_40px_rgba(239,68,68,0.6)] border-2 border-red-500/30 disabled:opacity-50"
+                  className="w-12 h-12 bg-gray-800 rounded-full flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(239,68,68,0.4)] hover:shadow-[0_0_30px_rgba(239,68,68,0.6)] border-2 border-red-500/30 disabled:opacity-50"
                 >
-                  <X size={28} className="text-red-500" strokeWidth={2.5} />
+                  <X size={22} className="text-red-500" strokeWidth={2.5} />
                 </button>
 
+                {/* Super Like Button */}
                 <button
                   onClick={handleSuperLike}
                   disabled={isAnimating}
-                  className="w-14 h-14 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-full flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 shadow-[0_0_30px_rgba(59,130,246,0.5)] hover:shadow-[0_0_40px_rgba(59,130,246,0.7)] relative disabled:opacity-50"
+                  className="w-10 h-10 bg-gradient-to-br from-blue-600 to-cyan-600 rounded-full flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(59,130,246,0.5)] hover:shadow-[0_0_30px_rgba(59,130,246,0.7)] relative disabled:opacity-50"
                 >
-                  <Star size={24} className="text-white" fill="white" />
+                  <Star size={18} className="text-white" fill="white" />
                   {superLikes > 0 && (
-                    <span className="absolute -top-1 -right-1 bg-yellow-400 text-blue-900 text-xs font-bold w-5 h-5 rounded-full flex items-center justify-center shadow-lg">
+                    <span className="absolute -top-1 -right-1 bg-yellow-400 text-blue-900 text-[10px] font-bold w-4 h-4 rounded-full flex items-center justify-center shadow-lg">
                       {superLikes}
                     </span>
                   )}
                 </button>
 
+                {/* Like Button */}
                 <button
                   onClick={handleLike}
                   disabled={isAnimating}
-                  className="w-16 h-16 bg-gradient-to-br from-pink-600 to-rose-600 rounded-full flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 shadow-[0_0_30px_rgba(236,72,153,0.6),0_0_20px_rgba(244,63,94,0.4)] hover:shadow-[0_0_50px_rgba(236,72,153,0.8),0_0_30px_rgba(244,63,94,0.6)] disabled:opacity-50"
+                  className="w-12 h-12 bg-gradient-to-br from-pink-600 to-rose-600 rounded-full flex items-center justify-center transition-all transform hover:scale-110 active:scale-95 shadow-[0_0_20px_rgba(236,72,153,0.6),0_0_15px_rgba(244,63,94,0.4)] hover:shadow-[0_0_30px_rgba(236,72,153,0.8),0_0_20px_rgba(244,63,94,0.6)] disabled:opacity-50"
                 >
-                  <Heart size={28} className="text-white" fill="white" />
+                  <Heart size={22} className="text-white" fill="white" />
                 </button>
               </div>
             </div>
@@ -601,17 +665,29 @@ const DiscoverPage = () => {
                         />
                         <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/70"></div>
                         <div className="absolute bottom-0 left-0 right-0 p-4 text-white">
-                          <p className="font-bold text-lg mb-3">{user.name}, {user.age}</p>
-                          <button
-                            onClick={() => {
-                              showToast(`Opening chat with ${user.name}...`);
-                              navigate(`/chat/${user.id}`);
-                            }}
-                            className="w-full bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-semibold py-2.5 rounded-full transition-all flex items-center justify-center gap-2 shadow-lg"
-                          >
-                            <MessageCircle size={16} />
-                            Send Message
-                          </button>
+                          <p className="font-bold text-lg mb-2">{user.name}, {user.age}</p>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => {
+                                setSelectedMatchForIcebreaker(user);
+                                setShowIcebreaker(true);
+                              }}
+                              className="flex-1 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-2 rounded-full transition-all flex items-center justify-center gap-1 text-sm"
+                              title="Break the ice"
+                            >
+                              💬 Ice
+                            </button>
+                            <button
+                              onClick={() => {
+                                showToast(`Opening chat with ${user.name}...`);
+                                navigate(`/chat/${user.id}`);
+                              }}
+                              className="flex-1 bg-gradient-to-r from-pink-600 to-rose-600 hover:from-pink-700 hover:to-rose-700 text-white font-semibold py-2 rounded-full transition-all flex items-center justify-center gap-1 text-sm"
+                            >
+                              <MessageCircle size={14} />
+                              Chat
+                            </button>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -646,18 +722,41 @@ const DiscoverPage = () => {
                 </div>
               </div>
 
+              {/* Profile Completion */}
+              <div className="mb-6">
+                <ProfileCompletion />
+              </div>
+
+              {/* Premium Button */}
+              {isPremium ? (
+                <div className="bg-gradient-to-br from-yellow-600/20 to-amber-600/20 rounded-2xl p-6 text-left border border-yellow-600/50">
+                  <div className="flex items-center gap-2 mb-3">
+                    <Zap className="text-yellow-400" size={28} />
+                    <span className="bg-yellow-400 text-yellow-900 text-xs font-bold px-2 py-0.5 rounded-full">ACTIVE</span>
+                  </div>
+                  <p className="text-white font-bold text-lg mb-1">Sparkmate Gold</p>
+                  <p className="text-gray-400 text-sm">You have unlimited swipes!</p>
+                </div>
+              ) : (
+                <button
+                  onClick={() => setShowPaymentModal(true)}
+                  className="w-full bg-gradient-to-br from-yellow-600/20 to-amber-600/20 hover:from-yellow-600/30 hover:to-amber-600/30 rounded-2xl p-6 text-left transition-all border border-yellow-600/50"
+                >
+                  <Zap className="text-yellow-400 mb-3" size={28} />
+                  <p className="text-white font-bold text-lg mb-1">Go Premium</p>
+                  <p className="text-gray-400 text-sm">Unlimited swipes • $14.99/month</p>
+                </button>
+              )}
 
               <button
-                onClick={() => navigate('/premium')}
-                className="bg-gradient-to-br from-yellow-600/20 to-amber-600/20 hover:from-yellow-600/30 hover:to-amber-600/30 rounded-2xl p-6 text-left transition-all border border-yellow-600/50"
-              >
-                <Zap className="text-yellow-400 mb-3" size={28} />
-                <p className="text-white font-bold text-lg mb-1">Go Premium</p>
-                <p className="text-gray-400 text-sm">Unlimited swipes</p>
-              </button>
-
-              <button
-                onClick={() => showToast('Profile boosted for 30 minutes! 🚀')}
+                onClick={() => {
+                  if (!isPremium) {
+                    showToast('Boost requires Premium! Upgrade now 👑');
+                    setShowPaymentModal(true);
+                  } else {
+                    showToast('Profile boosted for 30 minutes! 🚀');
+                  }
+                }}
                 className="bg-gradient-to-br from-pink-600/20 to-rose-600/20 hover:from-pink-600/30 hover:to-rose-600/30 rounded-2xl p-6 text-left transition-all border border-pink-600/50"
               >
                 <Sparkles className="text-pink-400 mb-3" size={28} />
@@ -933,6 +1032,40 @@ const DiscoverPage = () => {
           </div>
         )
       }
+
+      {/* Report Modal */}
+      <ReportModal
+        isOpen={showReportModal}
+        onClose={() => setShowReportModal(false)}
+        userName={currentUser?.name}
+        userId={currentUser?.id}
+        onBlock={handleBlockUser}
+      />
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onSuccess={() => {
+          setIsPremium(true);
+          showToast('Welcome to Sparkmate Gold! 👑');
+        }}
+        planPrice="$14.99/month"
+      />
+
+      {/* Icebreaker Prompts Modal */}
+      <IcebreakerPrompts
+        isOpen={showIcebreaker}
+        onClose={() => {
+          setShowIcebreaker(false);
+          setSelectedMatchForIcebreaker(null);
+        }}
+        matchName={selectedMatchForIcebreaker?.name || 'Match'}
+        onSend={(message) => {
+          showToast(`Message sent to ${selectedMatchForIcebreaker?.name}! 💬`);
+          navigate(`/chat/${selectedMatchForIcebreaker?.id}`);
+        }}
+      />
 
       {/* Toast Notification */}
       {

@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@headlessui/react": "^1.7.17",
+    "@tailwindcss/vite": "^4.1.17",
     "axios": "^1.13.2",
     "emoji-picker-react": "^4.5.16",
     "framer-motion": "^10.18.0",
@@ -20,7 +21,8 @@
     "react-router-dom": "^6.30.1",
     "react-tinder-card": "^1.6.4",
     "socket.io-client": "^4.6.1",
-    "swiper": "^11.0.5"
+    "swiper": "^11.0.5",
+    "tailwindcss": "^4.1.17"
   },
   "devDependencies": {
     "@types/react": "^18.2.43",

@@ -439,7 +439,7 @@ const DiscoverPage = () => {
                   <img
                     src={currentUser.images[imageIndex]}
                     alt={currentUser.name}
-                    className="w-full h-full object-cover object-top"
+                    className="w-full h-full object-contain object-top"
                   />
 
                   {/* Progress Bars */}
